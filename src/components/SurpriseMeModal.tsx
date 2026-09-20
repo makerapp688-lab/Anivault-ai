@@ -17,8 +17,6 @@ export const SurpriseMeModal: React.FC<SurpriseMeModalProps> = ({
   catalogue,
   onSelectAnime
 }) => {
-  if (!isOpen) return null;
-
   const [isRolling, setIsRolling] = useState(true);
   const [selectedAnime, setSelectedAnime] = useState<Anime | null>(null);
   const [diceRotation, setDiceRotation] = useState(0);
@@ -36,8 +34,12 @@ export const SurpriseMeModal: React.FC<SurpriseMeModalProps> = ({
   };
 
   useEffect(() => {
-    rollDice();
+    if (isOpen) {
+      rollDice();
+    }
   }, [isOpen]);
+
+  if (!isOpen) return null;
 
   const totalEpisodes = selectedAnime ? calculateTotalEpisodes(selectedAnime) : null;
   const watchResolution = selectedAnime ? resolveWatchUrl(selectedAnime) : null;

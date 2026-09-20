@@ -19,7 +19,7 @@ import {
   X
 } from 'lucide-react';
 import { Anime, CatalogueStats } from './types.ts';
-import { Navbar } from './components/Navbar.tsx';
+import { Navbar, NavTabType } from './components/Navbar.tsx';
 import { CategoryFilter } from './components/CategoryFilter.tsx';
 import { AnimeCard } from './components/AnimeCard.tsx';
 import { AnimeDetailsModal } from './components/AnimeDetailsModal.tsx';
@@ -28,6 +28,8 @@ import { MobileBottomNav } from './components/MobileBottomNav.tsx';
 import { SurpriseMeModal } from './components/SurpriseMeModal.tsx';
 import { AuthModal } from './components/AuthModal.tsx';
 import { AnimeArtwork } from './components/AnimeArtwork.tsx';
+import { CompareAnimeView } from './components/CompareAnimeView.tsx';
+import { AccountView } from './components/AccountView.tsx';
 import {
   RARETOON_BASE_URL,
   RARETOON_PROVIDER_NAME,
@@ -57,7 +59,7 @@ export function App() {
   const [isSurpriseOpen, setIsSurpriseOpen] = useState<boolean>(false);
   const [isAuthOpen, setIsAuthOpen] = useState<boolean>(false);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'browse' | 'watchlist' | 'favorites' | 'completed'>('browse');
+  const [activeTab, setActiveTab] = useState<NavTabType>('browse');
 
   const [stats, setStats] = useState<CatalogueStats | null>(fallbackReport as CatalogueStats);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -68,6 +70,7 @@ export function App() {
   const {
     account,
     userData,
+    isGuest,
     isFavorite,
     isWatchlist,
     isCompleted,
@@ -299,8 +302,6 @@ export function App() {
       {/* Navigation Bar */}
       <Navbar
         onOpenStats={() => setIsStatsOpen(true)}
-        onOpenSurprise={() => setIsSurpriseOpen(true)}
-        onOpenAuth={() => setIsAuthOpen(true)}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       />
@@ -324,7 +325,7 @@ export function App() {
                     </span>
                   </div>
                   <h1 className="text-xl md:text-2xl font-black text-white dark:text-white light:text-slate-900 tracking-tight">
-                    Welcome, Anime Explorer!
+                    Welcome, {account.username || (isGuest ? 'AnimeExplorer' : account.name || 'AnimeExplorer')}!
                   </h1>
                   <p className="text-xs md:text-sm text-slate-300 dark:text-slate-300 light:text-slate-600 max-w-2xl leading-relaxed">
                     Discover authentic Hindi Dubbed and Dual Audio anime. Pressing{' '}
@@ -482,7 +483,7 @@ export function App() {
         )}
 
         {/* Dedicated View Header for Watchlist, Favorites, or Watched Tabs */}
-        {activeTab !== 'browse' && (
+        {activeTab !== 'browse' && activeTab !== 'compare' && activeTab !== 'account' && (
           <div className="p-5 rounded-2xl bg-slate-900/80 dark:bg-slate-900/80 light:bg-white border border-slate-800 dark:border-slate-800 light:border-slate-200 space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
@@ -513,166 +514,178 @@ export function App() {
           </div>
         )}
 
-        {/* Global Instant Search Bar (Matching Screenshot 1 & 2) */}
-        <div className="relative">
-          <Search className="w-5 h-5 text-slate-500 absolute left-4 top-3.5 pointer-events-none" />
-          <input
-            type="text"
-            id="global-anime-search"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search anime by title, Hindi dub, English dub, or genre..."
-            className="w-full pl-12 pr-10 py-3 rounded-2xl bg-slate-900/90 dark:bg-slate-900/90 light:bg-white border border-slate-800/90 dark:border-slate-800/90 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 placeholder-slate-500 focus:outline-none focus:border-rose-500 shadow-inner transition-colors"
+        {/* View Switcher: Compare, Account, or Catalogue View */}
+        {activeTab === 'compare' ? (
+          <CompareAnimeView
+            allAnime={allAnime}
+            onOpenDetails={handleSelectAnime}
           />
-          {searchQuery && (
-            <button
-              type="button"
-              id="btn-clear-search-input"
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3.5 top-3.5 text-slate-400 hover:text-white"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-
-        {/* Category & Format Filter Navigation */}
-        <div ref={categoriesSectionRef}>
-          <CategoryFilter
-            selectedGenre={selectedGenre}
-            onSelectGenre={setSelectedGenre}
-            selectedType={selectedType}
-            onSelectType={setSelectedType}
-            selectedAudioFilter={selectedAudioFilter}
-            onSelectAudioFilter={setSelectedAudioFilter}
-            selectedStatusFilter={selectedStatusFilter}
-            onSelectStatusFilter={setSelectedStatusFilter}
-            genres={genresWithCounts}
-            totalResults={filteredAnime.length}
-          />
-        </div>
-
-        {/* Results Bar & Sort Order Selector */}
-        <div className="flex items-center justify-between flex-wrap gap-3 pt-3 border-t border-slate-800/60 dark:border-slate-800/60 light:border-slate-200">
-          <div className="text-xs font-semibold text-slate-400">
-            Showing <strong className="text-white dark:text-white light:text-slate-900">{filteredAnime.length}</strong> anime titles
-          </div>
-
-          <div className="flex items-center gap-2 text-xs text-slate-400">
-            <span>Sort:</span>
-            <select
-              id="sort-select"
-              value={sortBy}
-              onChange={e => setSortBy(e.target.value as any)}
-              className="bg-slate-900 dark:bg-slate-900 light:bg-white border border-slate-800 dark:border-slate-800 light:border-slate-300 text-slate-200 dark:text-slate-200 light:text-slate-800 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-rose-500 font-medium cursor-pointer"
-            >
-              <option value="popular">Popular (Multi-Season First)</option>
-              <option value="title">Title (A - Z)</option>
-              <option value="year">Release Year (Newest)</option>
-              <option value="seasons">Season Count</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Anime Catalogue Grid */}
-        {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5 py-6">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div
-                key={i}
-                className="bg-slate-900 border border-slate-800 rounded-2xl p-2.5 space-y-2 animate-pulse"
-              >
-                <div className="w-full aspect-[3/4] bg-slate-800 rounded-xl" />
-                <div className="h-3.5 bg-slate-800 rounded w-3/4" />
-                <div className="h-3 bg-slate-800 rounded w-1/2" />
-              </div>
-            ))}
-          </div>
-        ) : paginatedAnime.length === 0 ? (
-          <div
-            id="empty-catalogue-state"
-            className="p-12 text-center bg-slate-900/50 dark:bg-slate-900/50 light:bg-white border border-slate-800/80 dark:border-slate-800/80 light:border-slate-200 rounded-2xl my-6 space-y-3"
-          >
-            <div className="w-12 h-12 rounded-full bg-slate-800 dark:bg-slate-800 light:bg-slate-100 flex items-center justify-center mx-auto text-slate-500">
-              <Search className="w-6 h-6" />
-            </div>
-            <h3 className="text-base font-bold text-white dark:text-white light:text-slate-900">
-              {activeTab !== 'browse'
-                ? `No items in ${activeTab === 'watchlist' ? 'Watch Later' : activeTab === 'favorites' ? 'Favorites' : 'Watched'}`
-                : 'No Anime Found'}
-            </h3>
-            <p className="text-xs text-slate-400 dark:text-slate-400 light:text-slate-600 max-w-sm mx-auto">
-              {activeTab !== 'browse'
-                ? 'Use the bookmark, heart, and checkmark buttons on anime cards to curate your personal collection.'
-                : `No anime matches your filter criteria "${searchQuery || selectedGenre}". Try searching another title or resetting your filters.`}
-            </p>
-            <button
-              type="button"
-              id="btn-clear-search-empty"
-              onClick={() => {
-                setActiveTab('browse');
-                setSearchQuery('');
-                setSelectedGenre('All');
-                setSelectedType('All');
-                setSelectedAudioFilter('all');
-                setSelectedStatusFilter('all');
-              }}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 text-white hover:bg-rose-500 transition-colors inline-block"
-            >
-              Browse All Titles
-            </button>
-          </div>
+        ) : activeTab === 'account' ? (
+          <AccountView onOpenAuthModal={() => setIsAuthOpen(true)} />
         ) : (
-          <div
-            id="anime-catalogue-grid"
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5"
-          >
-            {paginatedAnime.map(anime => (
-              <AnimeCard
-                key={anime.id}
-                anime={anime}
-                onSelect={handleSelectAnime}
+          <>
+            {/* Global Instant Search Bar (Matching Screenshot 1 & 2) */}
+            <div className="relative">
+              <Search className="w-5 h-5 text-slate-500 absolute left-4 top-3.5 pointer-events-none" />
+              <input
+                type="text"
+                id="global-anime-search"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search anime by title, Hindi dub, English dub, or genre..."
+                className="w-full pl-12 pr-10 py-3 rounded-2xl bg-slate-900/90 dark:bg-slate-900/90 light:bg-white border border-slate-800/90 dark:border-slate-800/90 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 placeholder-slate-500 focus:outline-none focus:border-rose-500 shadow-inner transition-colors"
               />
-            ))}
-          </div>
-        )}
+              {searchQuery && (
+                <button
+                  type="button"
+                  id="btn-clear-search-input"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3.5 top-3.5 text-slate-400 hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
 
-        {/* Pagination Controls */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between py-6 border-t border-slate-800/80 dark:border-slate-800/80 light:border-slate-200">
-            <button
-              type="button"
-              id="btn-prev-page"
-              disabled={currentPage <= 1}
-              onClick={() => {
-                setCurrentPage(p => Math.max(1, p - 1));
-                scrollToTop();
-              }}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-900 dark:bg-slate-900 light:bg-white hover:bg-slate-800 dark:hover:bg-slate-800 light:hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed border border-slate-800 dark:border-slate-800 light:border-slate-300 text-slate-200 dark:text-slate-200 light:text-slate-800 transition-colors"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Previous</span>
-            </button>
+            {/* Category & Format Filter Navigation */}
+            <div ref={categoriesSectionRef}>
+              <CategoryFilter
+                selectedGenre={selectedGenre}
+                onSelectGenre={setSelectedGenre}
+                selectedType={selectedType}
+                onSelectType={setSelectedType}
+                selectedAudioFilter={selectedAudioFilter}
+                onSelectAudioFilter={setSelectedAudioFilter}
+                selectedStatusFilter={selectedStatusFilter}
+                onSelectStatusFilter={setSelectedStatusFilter}
+                genres={genresWithCounts}
+                totalResults={filteredAnime.length}
+              />
+            </div>
 
-            <span className="text-xs text-slate-400">
-              Page <strong className="text-white dark:text-white light:text-slate-900">{currentPage}</strong> of{' '}
-              <strong className="text-white dark:text-white light:text-slate-900">{totalPages}</strong> ({filteredAnime.length} anime)
-            </span>
+            {/* Results Bar & Sort Order Selector */}
+            <div className="flex items-center justify-between flex-wrap gap-3 pt-3 border-t border-slate-800/60 dark:border-slate-800/60 light:border-slate-200">
+              <div className="text-xs font-semibold text-slate-400">
+                Showing <strong className="text-white dark:text-white light:text-slate-900">{filteredAnime.length}</strong> anime titles
+              </div>
 
-            <button
-              type="button"
-              id="btn-next-page"
-              disabled={currentPage >= totalPages}
-              onClick={() => {
-                setCurrentPage(p => Math.min(totalPages, p + 1));
-                scrollToTop();
-              }}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-900 dark:bg-slate-900 light:bg-white hover:bg-slate-800 dark:hover:bg-slate-800 light:hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed border border-slate-800 dark:border-slate-800 light:border-slate-300 text-slate-200 dark:text-slate-200 light:text-slate-800 transition-colors"
-            >
-              <span>Next</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
+              <div className="flex items-center gap-2 text-xs text-slate-400">
+                <span>Sort:</span>
+                <select
+                  id="sort-select"
+                  value={sortBy}
+                  onChange={e => setSortBy(e.target.value as any)}
+                  className="bg-slate-900 dark:bg-slate-900 light:bg-white border border-slate-800 dark:border-slate-800 light:border-slate-300 text-slate-200 dark:text-slate-200 light:text-slate-800 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-rose-500 font-medium cursor-pointer"
+                >
+                  <option value="popular">Popular (Multi-Season First)</option>
+                  <option value="title">Title (A - Z)</option>
+                  <option value="year">Release Year (Newest)</option>
+                  <option value="seasons">Season Count</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Anime Catalogue Grid */}
+            {isLoading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5 py-6">
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-slate-900 border border-slate-800 rounded-2xl p-2.5 space-y-2 animate-pulse"
+                  >
+                    <div className="w-full aspect-[3/4] bg-slate-800 rounded-xl" />
+                    <div className="h-3.5 bg-slate-800 rounded w-3/4" />
+                    <div className="h-3 bg-slate-800 rounded w-1/2" />
+                  </div>
+                ))}
+              </div>
+            ) : paginatedAnime.length === 0 ? (
+              <div
+                id="empty-catalogue-state"
+                className="p-12 text-center bg-slate-900/50 dark:bg-slate-900/50 light:bg-white border border-slate-800/80 dark:border-slate-800/80 light:border-slate-200 rounded-2xl my-6 space-y-3"
+              >
+                <div className="w-12 h-12 rounded-full bg-slate-800 dark:bg-slate-800 light:bg-slate-100 flex items-center justify-center mx-auto text-slate-500">
+                  <Search className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-bold text-white dark:text-white light:text-slate-900">
+                  {activeTab !== 'browse'
+                    ? `No items in ${activeTab === 'watchlist' ? 'Watch Later' : activeTab === 'favorites' ? 'Favorites' : 'Watched'}`
+                    : 'No Anime Found'}
+                </h3>
+                <p className="text-xs text-slate-400 dark:text-slate-400 light:text-slate-600 max-w-sm mx-auto">
+                  {activeTab !== 'browse'
+                    ? 'Use the bookmark, heart, and checkmark buttons on anime cards to curate your personal collection.'
+                    : `No anime matches your filter criteria "${searchQuery || selectedGenre}". Try searching another title or resetting your filters.`}
+                </p>
+                <button
+                  type="button"
+                  id="btn-clear-search-empty"
+                  onClick={() => {
+                    setActiveTab('browse');
+                    setSearchQuery('');
+                    setSelectedGenre('All');
+                    setSelectedType('All');
+                    setSelectedAudioFilter('all');
+                    setSelectedStatusFilter('all');
+                  }}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 text-white hover:bg-rose-500 transition-colors inline-block"
+                >
+                  Browse All Titles
+                </button>
+              </div>
+            ) : (
+              <div
+                id="anime-catalogue-grid"
+                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5"
+              >
+                {paginatedAnime.map(anime => (
+                  <AnimeCard
+                    key={anime.id}
+                    anime={anime}
+                    onSelect={handleSelectAnime}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between py-6 border-t border-slate-800/80 dark:border-slate-800/80 light:border-slate-200">
+                <button
+                  type="button"
+                  id="btn-prev-page"
+                  disabled={currentPage <= 1}
+                  onClick={() => {
+                    setCurrentPage(p => Math.max(1, p - 1));
+                    scrollToTop();
+                  }}
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-900 dark:bg-slate-900 light:bg-white hover:bg-slate-800 dark:hover:bg-slate-800 light:hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed border border-slate-800 dark:border-slate-800 light:border-slate-300 text-slate-200 dark:text-slate-200 light:text-slate-800 transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  <span>Previous</span>
+                </button>
+
+                <span className="text-xs text-slate-400">
+                  Page <strong className="text-white dark:text-white light:text-slate-900">{currentPage}</strong> of{' '}
+                  <strong className="text-white dark:text-white light:text-slate-900">{totalPages}</strong> ({filteredAnime.length} anime)
+                </span>
+
+                <button
+                  type="button"
+                  id="btn-next-page"
+                  disabled={currentPage >= totalPages}
+                  onClick={() => {
+                    setCurrentPage(p => Math.min(totalPages, p + 1));
+                    scrollToTop();
+                  }}
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-900 dark:bg-slate-900 light:bg-white hover:bg-slate-800 dark:hover:bg-slate-800 light:hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed border border-slate-800 dark:border-slate-800 light:border-slate-300 text-slate-200 dark:text-slate-200 light:text-slate-800 transition-colors"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </>
         )}
       </main>
 
@@ -726,28 +739,34 @@ export function App() {
       )}
 
       {/* Production Catalogue Report Modal */}
-      <StatsModal
-        isOpen={isStatsOpen}
-        onClose={() => setIsStatsOpen(false)}
-        stats={stats}
-        totalAnime={allAnime.length}
-        isSyncing={isSyncing}
-        onTriggerSync={handleTriggerSync}
-      />
+      {isStatsOpen && (
+        <StatsModal
+          isOpen={isStatsOpen}
+          onClose={() => setIsStatsOpen(false)}
+          stats={stats}
+          totalAnime={allAnime.length}
+          isSyncing={isSyncing}
+          onTriggerSync={handleTriggerSync}
+        />
+      )}
 
       {/* Surprise Me / Dice Rolling Modal */}
-      <SurpriseMeModal
-        isOpen={isSurpriseOpen}
-        onClose={() => setIsSurpriseOpen(false)}
-        catalogue={allAnime}
-        onSelectAnime={handleSelectAnime}
-      />
+      {isSurpriseOpen && (
+        <SurpriseMeModal
+          isOpen={isSurpriseOpen}
+          onClose={() => setIsSurpriseOpen(false)}
+          catalogue={allAnime}
+          onSelectAnime={handleSelectAnime}
+        />
+      )}
 
       {/* Account & Guest Mode Modal */}
-      <AuthModal
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
-      />
+      {isAuthOpen && (
+        <AuthModal
+          isOpen={isAuthOpen}
+          onClose={() => setIsAuthOpen(false)}
+        />
+      )}
 
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav

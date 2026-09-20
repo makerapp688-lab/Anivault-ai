@@ -11,7 +11,9 @@ import {
   FolderSync,
   Heart,
   Bookmark,
-  Check
+  Check,
+  Edit2,
+  Users
 } from 'lucide-react';
 import { UserAccount } from '../types.ts';
 import {
@@ -19,10 +21,13 @@ import {
   loginWithEmail,
   loginWithProvider,
   logoutToGuest,
+  updateUsername,
   hasGuestDataToMigrate,
   migrateGuestDataToAccount,
   getGuestData,
-  getUserData
+  getUserData,
+  getSavedAccounts,
+  switchAccount
 } from '../utils/userStorage.ts';
 
 interface AuthModalProps {
@@ -36,16 +41,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onClose,
   onAccountChanged
 }) => {
-  if (!isOpen) return null;
-
   const currentAccount = getCurrentAccount();
   const isGuest = currentAccount.provider === 'guest';
   const userData = getUserData();
   const guestData = getGuestData();
   const canMigrate = isGuest && hasGuestDataToMigrate();
+  const savedAccounts = getSavedAccounts();
 
+  // Mode: 'overview' | 'email' | 'provider' | 'edit_username'
+  const [activeView, setActiveView] = useState<'overview' | 'email' | 'google' | 'apple' | 'edit_username'>('overview');
+  const [providerEmail, setProviderEmail] = useState('');
+  const [chosenUsername, setChosenUsername] = useState(currentAccount.username || 'AnimeExplorer');
   const [emailInput, setEmailInput] = useState('');
-  const [nameInput, setNameInput] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
   const [showMigratePrompt, setShowMigratePrompt] = useState(false);
   const [pendingAccount, setPendingAccount] = useState<UserAccount | null>(null);
@@ -55,6 +62,45 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     completedCount: number;
   } | null>(null);
 
+  if (!isOpen) return null;
+
+  const handleUpdateUsernameSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chosenUsername.trim()) return;
+    updateUsername(chosenUsername.trim());
+    setActiveView('overview');
+    onAccountChanged?.();
+  };
+
+  const handleProviderLoginSubmit = (provider: 'google' | 'apple') => {
+    if (!providerEmail || !providerEmail.includes('@')) {
+      setAuthError(`Please enter a valid ${provider === 'google' ? 'Google / Gmail' : 'Apple ID'} email.`);
+      return;
+    }
+
+    const cleanEmail = providerEmail.trim().toLowerCase();
+    const username = chosenUsername.trim() || cleanEmail.split('@')[0] || 'AnimeExplorer';
+    const providerName = provider === 'google' ? 'Google Account' : 'Apple ID Account';
+
+    if (canMigrate) {
+      const id = `${provider}_${btoa(cleanEmail).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16)}`;
+      const acc: UserAccount = {
+        id,
+        username,
+        name: providerName,
+        email: cleanEmail,
+        provider,
+        createdAt: new Date().toISOString()
+      };
+      setPendingAccount(acc);
+      setShowMigratePrompt(true);
+    } else {
+      loginWithProvider(provider, cleanEmail, providerName, username);
+      onAccountChanged?.();
+      onClose();
+    }
+  };
+
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!emailInput || !emailInput.includes('@')) {
@@ -62,14 +108,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
+    const cleanEmail = emailInput.trim().toLowerCase();
+    const username = chosenUsername.trim() || cleanEmail.split('@')[0] || 'AnimeExplorer';
+
     if (canMigrate) {
-      // Create pending account and prompt user to migrate
-      const cleanEmail = emailInput.trim().toLowerCase();
-      const name = nameInput.trim() || cleanEmail.split('@')[0];
       const id = `user_${btoa(cleanEmail).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16)}`;
       const acc: UserAccount = {
         id,
-        name,
+        username,
+        name: cleanEmail.split('@')[0],
         email: cleanEmail,
         provider: 'email',
         createdAt: new Date().toISOString()
@@ -77,38 +124,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setPendingAccount(acc);
       setShowMigratePrompt(true);
     } else {
-      loginWithEmail(emailInput, nameInput);
-      onAccountChanged?.();
-      onClose();
-    }
-  };
-
-  const handleProviderLogin = (provider: 'google' | 'apple') => {
-    // Standard client OAuth flow or account profile creation
-    const emailPrompt = prompt(
-      `Enter your ${provider === 'google' ? 'Google / Gmail' : 'Apple ID'} email to sign in:`,
-      provider === 'google' ? 'user@gmail.com' : 'user@icloud.com'
-    );
-    if (!emailPrompt || !emailPrompt.includes('@')) return;
-
-    const name = emailPrompt.split('@')[0];
-    if (canMigrate) {
-      const id = `${provider}_${btoa(emailPrompt).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16)}`;
-      const acc: UserAccount = {
-        id,
-        name: `${provider === 'google' ? 'Google User' : 'Apple User'} (${name})`,
-        email: emailPrompt.trim().toLowerCase(),
-        provider,
-        createdAt: new Date().toISOString()
-      };
-      setPendingAccount(acc);
-      setShowMigratePrompt(true);
-    } else {
-      loginWithProvider(
-        provider,
-        emailPrompt.trim().toLowerCase(),
-        `${provider === 'google' ? 'Google User' : 'Apple User'} (${name})`
-      );
+      loginWithEmail(cleanEmail, username);
       onAccountChanged?.();
       onClose();
     }
@@ -117,12 +133,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const confirmMigration = (doMigrate: boolean) => {
     if (!pendingAccount) return;
     if (pendingAccount.provider === 'email') {
-      loginWithEmail(pendingAccount.email || '', pendingAccount.name);
+      loginWithEmail(pendingAccount.email || '', pendingAccount.username);
     } else {
       loginWithProvider(
         pendingAccount.provider as any,
         pendingAccount.email || '',
-        pendingAccount.name
+        pendingAccount.name,
+        pendingAccount.username
       );
     }
 
@@ -143,6 +160,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     onAccountChanged?.();
   };
 
+  const handleSwitchToSaved = (acc: UserAccount) => {
+    switchAccount(acc);
+    onAccountChanged?.();
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/80 backdrop-blur-sm overflow-y-auto"
@@ -159,7 +181,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-rose-500" />
             <h2 className="text-base font-bold text-white dark:text-white light:text-slate-900">
-              AniVault Account
+              AniVault Account &amp; Profile
             </h2>
           </div>
           <button
@@ -174,31 +196,76 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Content */}
         <div className="p-5 space-y-5 text-slate-200 dark:text-slate-200 light:text-slate-800">
-          {/* Active Account Status */}
+          {/* Active Account Banner */}
           <div className="p-4 bg-slate-950/80 dark:bg-slate-950/80 light:bg-slate-50 border border-slate-800 dark:border-slate-800 light:border-slate-200 rounded-xl space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-start justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-full bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 font-bold">
-                  {currentAccount.name.charAt(0).toUpperCase()}
+                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 border border-rose-400/40 flex items-center justify-center text-white font-black text-sm shadow-md">
+                  {(currentAccount.username || currentAccount.name).charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <div className="text-sm font-bold text-white dark:text-white light:text-slate-900">
-                    {currentAccount.name}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm font-bold text-white dark:text-white light:text-slate-900">
+                      {currentAccount.username || 'AnimeExplorer'}
+                    </span>
+                    <button
+                      type="button"
+                      id="btn-edit-username-toggle"
+                      onClick={() => {
+                        setChosenUsername(currentAccount.username || 'AnimeExplorer');
+                        setActiveView(activeView === 'edit_username' ? 'overview' : 'edit_username');
+                      }}
+                      className="text-slate-400 hover:text-rose-400 p-0.5 transition-colors"
+                      title="Change display username"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                   <div className="text-xs text-slate-400 dark:text-slate-400 light:text-slate-500">
-                    {currentAccount.email || 'Guest Explorer Session'}
+                    {isGuest ? 'Guest Session' : `${currentAccount.name} (${currentAccount.email})`}
                   </div>
                 </div>
               </div>
 
-              <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
-                isGuest
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                currentAccount.provider === 'apple'
+                  ? 'bg-zinc-800 text-zinc-200 border border-zinc-700'
+                  : currentAccount.provider === 'google'
+                  ? 'bg-blue-950/80 text-blue-300 border border-blue-700/50'
+                  : isGuest
                   ? 'bg-amber-950/80 text-amber-300 border border-amber-700/50'
                   : 'bg-emerald-950/80 text-emerald-300 border border-emerald-700/50'
               }`}>
-                {currentAccount.provider}
+                {currentAccount.provider === 'apple' ? 'Apple ID' : currentAccount.provider === 'google' ? 'Google' : currentAccount.provider}
               </span>
             </div>
+
+            {/* Quick edit username form */}
+            {activeView === 'edit_username' && (
+              <form onSubmit={handleUpdateUsernameSubmit} className="pt-2 border-t border-slate-800 dark:border-slate-800 light:border-slate-200 space-y-2">
+                <label className="block text-[11px] font-semibold text-slate-300 dark:text-slate-300 light:text-slate-700">
+                  Custom Display Username
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    id="input-change-username"
+                    value={chosenUsername}
+                    onChange={e => setChosenUsername(e.target.value)}
+                    placeholder="e.g. AnimeExplorer"
+                    className="flex-1 px-3 py-1.5 rounded-lg bg-slate-900 dark:bg-slate-900 light:bg-white border border-slate-700 dark:border-slate-700 light:border-slate-300 text-xs text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-rose-500"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    id="btn-save-username"
+                    className="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white transition-colors"
+                  >
+                    Save
+                  </button>
+                </div>
+              </form>
+            )}
 
             {/* Account Specific Data Stats */}
             <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800 dark:border-slate-800 light:border-slate-200 text-center">
@@ -286,7 +353,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {isGuest && !showMigratePrompt && (
             <div className="space-y-4">
               <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider text-center">
-                Sign In or Switch Account
+                Sign In with Verified Identity
               </div>
 
               {/* 3P OAuth Buttons: Google & Apple */}
@@ -294,8 +361,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <button
                   type="button"
                   id="btn-auth-google"
-                  onClick={() => handleProviderLogin('google')}
-                  className="py-2.5 px-3 rounded-xl bg-slate-800/90 hover:bg-slate-700 dark:bg-slate-800/90 dark:hover:bg-slate-700 light:bg-slate-100 light:hover:bg-slate-200 border border-slate-700 dark:border-slate-700 light:border-slate-300 text-xs font-semibold text-white dark:text-white light:text-slate-900 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
+                  onClick={() => {
+                    setActiveView('google');
+                    setAuthError(null);
+                  }}
+                  className={`py-2.5 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all hover:scale-[1.02] ${
+                    activeView === 'google'
+                      ? 'bg-blue-600/30 border-blue-500 text-white'
+                      : 'bg-slate-800/90 hover:bg-slate-700 dark:bg-slate-800/90 dark:hover:bg-slate-700 light:bg-slate-100 light:hover:bg-slate-200 border-slate-700 dark:border-slate-700 light:border-slate-300 text-white dark:text-white light:text-slate-900'
+                  }`}
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24">
                     <path
@@ -315,83 +389,191 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2-6.4-4.8L1.9 16.4C3.7 20.1 7.5 23 12 23z"
                     />
                   </svg>
-                  <span>Google Sign In</span>
+                  <span>Google Account</span>
                 </button>
 
                 <button
                   type="button"
                   id="btn-auth-apple"
-                  onClick={() => handleProviderLogin('apple')}
-                  className="py-2.5 px-3 rounded-xl bg-slate-800/90 hover:bg-slate-700 dark:bg-slate-800/90 dark:hover:bg-slate-700 light:bg-slate-100 light:hover:bg-slate-200 border border-slate-700 dark:border-slate-700 light:border-slate-300 text-xs font-semibold text-white dark:text-white light:text-slate-900 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
+                  onClick={() => {
+                    setActiveView('apple');
+                    setAuthError(null);
+                  }}
+                  className={`py-2.5 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all hover:scale-[1.02] ${
+                    activeView === 'apple'
+                      ? 'bg-zinc-700/50 border-zinc-400 text-white'
+                      : 'bg-slate-800/90 hover:bg-slate-700 dark:bg-slate-800/90 dark:hover:bg-slate-700 light:bg-slate-100 light:hover:bg-slate-200 border-slate-700 dark:border-slate-700 light:border-slate-300 text-white dark:text-white light:text-slate-900'
+                  }`}
                 >
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 170 170">
                     <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.6-7.71-11.71-14.01-6.19-9.56-11.07-20.9-14.65-34.02-3.58-13.11-5.37-25.29-5.37-36.54 0-14.99 3.82-27.17 11.45-36.54 7.63-9.37 17.06-14.16 28.3-14.36 4.79 0 10.37 1.25 16.74 3.75 6.37 2.5 10.33 3.8 11.89 3.9 1.9-.3 6.13-1.74 12.7-4.33 6.57-2.58 12.22-3.78 16.94-3.6 12.49.6 22.84 5.3 31.06 14.1-10.9 6.6-16.2 15.7-15.9 27.3.3 9.1 3.8 16.7 10.5 22.8 6.7 6.1 14.6 9.6 23.7 10.5-2.2 6.6-5.1 13.5-8.7 20.7zM119.22 33.15c0-7.39 2.65-14.28 7.95-20.67 5.3-6.39 11.9-10.48 19.8-12.28.3 1.2.5 2.5.5 3.9 0 7.39-2.75 14.28-8.25 20.67-5.5 6.39-12.15 10.48-19.95 12.28-.1-1.3-.05-2.6-.05-3.9z" />
                   </svg>
-                  <span>Apple Sign In</span>
+                  <span>Apple ID</span>
                 </button>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="h-px flex-1 bg-slate-800 dark:bg-slate-800 light:bg-slate-200" />
-                <span className="text-[11px] text-slate-500 font-medium">or continue with email</span>
-                <div className="h-px flex-1 bg-slate-800 dark:bg-slate-800 light:bg-slate-200" />
-              </div>
+              {/* Provider interactive sign in panel */}
+              {(activeView === 'google' || activeView === 'apple') && (
+                <div className="p-4 bg-slate-950/90 dark:bg-slate-950/90 light:bg-slate-100 border border-slate-800 dark:border-slate-800 light:border-slate-300 rounded-xl space-y-3">
+                  <div className="text-xs font-bold text-white dark:text-white light:text-slate-900 flex items-center justify-between">
+                    <span>Connect with {activeView === 'google' ? 'Google Account' : 'Apple ID'}</span>
+                    <button
+                      type="button"
+                      onClick={() => setActiveView('overview')}
+                      className="text-[11px] text-slate-400 hover:text-slate-200"
+                    >
+                      Back
+                    </button>
+                  </div>
 
-              {/* Email Login Form */}
-              <form onSubmit={handleEmailSubmit} className="space-y-3">
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 dark:text-slate-400 light:text-slate-600 mb-1">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-3 pointer-events-none" />
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-400 dark:text-slate-400 light:text-slate-600 mb-1">
+                      {activeView === 'google' ? 'Google / Gmail Email' : 'Apple ID Email'}
+                    </label>
                     <input
                       type="email"
-                      id="input-auth-email"
-                      value={emailInput}
+                      id="input-provider-email"
+                      value={providerEmail}
                       onChange={e => {
-                        setEmailInput(e.target.value);
+                        setProviderEmail(e.target.value);
                         setAuthError(null);
                       }}
-                      placeholder="you@example.com"
-                      className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950/70 dark:bg-slate-950/70 light:bg-slate-100 border border-slate-700/80 dark:border-slate-700/80 light:border-slate-300 text-xs text-white dark:text-white light:text-slate-900 placeholder-slate-500 focus:outline-none focus:border-rose-500 transition-colors"
+                      placeholder={activeView === 'google' ? 'user@gmail.com' : 'user@icloud.com'}
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900 dark:bg-slate-900 light:bg-white border border-slate-700 dark:border-slate-700 light:border-slate-300 text-xs text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-rose-500"
                       required
                     />
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 dark:text-slate-400 light:text-slate-600 mb-1">
-                    Display Name (Optional)
-                  </label>
-                  <div className="relative">
-                    <User className="w-4 h-4 text-slate-500 absolute left-3 top-3 pointer-events-none" />
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-400 dark:text-slate-400 light:text-slate-600 mb-1">
+                      Choose AniVault Display Username
+                    </label>
                     <input
                       type="text"
-                      id="input-auth-name"
-                      value={nameInput}
-                      onChange={e => setNameInput(e.target.value)}
-                      placeholder="e.g. AnimeFan99"
-                      className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950/70 dark:bg-slate-950/70 light:bg-slate-100 border border-slate-700/80 dark:border-slate-700/80 light:border-slate-300 text-xs text-white dark:text-white light:text-slate-900 placeholder-slate-500 focus:outline-none focus:border-rose-500 transition-colors"
+                      id="input-provider-username"
+                      value={chosenUsername}
+                      onChange={e => setChosenUsername(e.target.value)}
+                      placeholder="e.g. AnimeExplorer"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900 dark:bg-slate-900 light:bg-white border border-slate-700 dark:border-slate-700 light:border-slate-300 text-xs text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-rose-500"
+                      required
                     />
+                    <p className="text-[10px] text-slate-400 mt-1">
+                      This username will be displayed across AniVault, separate from your auth email.
+                    </p>
+                  </div>
+
+                  {authError && (
+                    <div className="text-[11px] text-rose-400 font-medium">{authError}</div>
+                  )}
+
+                  <button
+                    type="button"
+                    id="btn-provider-submit"
+                    onClick={() => handleProviderLoginSubmit(activeView)}
+                    className="w-full py-2.5 rounded-xl font-bold text-xs bg-rose-600 hover:bg-rose-500 text-white shadow-md transition-colors flex items-center justify-center gap-1.5"
+                  >
+                    <span>Authenticate &amp; Keep Session</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+
+              {/* Standard Email Login */}
+              {activeView !== 'google' && activeView !== 'apple' && (
+                <>
+                  <div className="flex items-center gap-3">
+                    <div className="h-px flex-1 bg-slate-800 dark:bg-slate-800 light:bg-slate-200" />
+                    <span className="text-[11px] text-slate-500 font-medium">or continue with email</span>
+                    <div className="h-px flex-1 bg-slate-800 dark:bg-slate-800 light:bg-slate-200" />
+                  </div>
+
+                  <form onSubmit={handleEmailSubmit} className="space-y-3">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-400 dark:text-slate-400 light:text-slate-600 mb-1">
+                        Email Address
+                      </label>
+                      <div className="relative">
+                        <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-3 pointer-events-none" />
+                        <input
+                          type="email"
+                          id="input-auth-email"
+                          value={emailInput}
+                          onChange={e => {
+                            setEmailInput(e.target.value);
+                            setAuthError(null);
+                          }}
+                          placeholder="you@example.com"
+                          className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950/70 dark:bg-slate-950/70 light:bg-slate-100 border border-slate-700/80 dark:border-slate-700/80 light:border-slate-300 text-xs text-white dark:text-white light:text-slate-900 placeholder-slate-500 focus:outline-none focus:border-rose-500 transition-colors"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-400 dark:text-slate-400 light:text-slate-600 mb-1">
+                        AniVault Display Username
+                      </label>
+                      <div className="relative">
+                        <User className="w-4 h-4 text-slate-500 absolute left-3 top-3 pointer-events-none" />
+                        <input
+                          type="text"
+                          id="input-auth-name"
+                          value={chosenUsername}
+                          onChange={e => setChosenUsername(e.target.value)}
+                          placeholder="e.g. AnimeExplorer"
+                          className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950/70 dark:bg-slate-950/70 light:bg-slate-100 border border-slate-700/80 dark:border-slate-700/80 light:border-slate-300 text-xs text-white dark:text-white light:text-slate-900 placeholder-slate-500 focus:outline-none focus:border-rose-500 transition-colors"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {authError && (
+                      <div className="text-[11px] text-rose-400 font-medium">
+                        {authError}
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      id="btn-auth-submit"
+                      className="w-full py-2.5 px-4 rounded-xl font-bold text-xs bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white shadow-md shadow-rose-600/30 flex items-center justify-center gap-1.5 transition-all"
+                    >
+                      <span>Sign In &amp; Save Profile</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </form>
+                </>
+              )}
+
+              {/* Saved accounts / identity switcher */}
+              {savedAccounts.length > 0 && (
+                <div className="pt-2 border-t border-slate-800 dark:border-slate-800 light:border-slate-200 space-y-1.5">
+                  <div className="text-[11px] font-semibold text-slate-400 flex items-center gap-1">
+                    <Users className="w-3 h-3" />
+                    <span>Saved Accounts on This Device</span>
+                  </div>
+                  <div className="space-y-1">
+                    {savedAccounts.map(acc => (
+                      <div
+                        key={acc.id}
+                        onClick={() => handleSwitchToSaved(acc)}
+                        className="p-2 rounded-lg bg-slate-950/60 dark:bg-slate-950/60 light:bg-slate-50 hover:bg-slate-800 dark:hover:bg-slate-800 light:hover:bg-slate-100 border border-slate-800/80 dark:border-slate-800/80 light:border-slate-200 cursor-pointer flex items-center justify-between text-xs transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-rose-500/20 text-rose-400 text-[10px] font-bold flex items-center justify-center">
+                            {(acc.username || acc.name).charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <span className="font-bold text-white dark:text-white light:text-slate-900">{acc.username || acc.name}</span>
+                            <span className="text-[10px] text-slate-400 ml-1.5">({acc.email || acc.provider})</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] text-rose-400 font-semibold">Switch</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
-
-                {authError && (
-                  <div className="text-[11px] text-rose-400 font-medium">
-                    {authError}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  id="btn-auth-submit"
-                  className="w-full py-2.5 px-4 rounded-xl font-bold text-xs bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white shadow-md shadow-rose-600/30 flex items-center justify-center gap-1.5 transition-all"
-                >
-                  <span>Sign In &amp; Save Profile</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </form>
+              )}
             </div>
           )}
 
@@ -403,7 +585,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               onClick={onClose}
               className="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-slate-800/60 hover:bg-slate-800 dark:bg-slate-800/60 dark:hover:bg-slate-800 light:bg-slate-100 light:hover:bg-slate-200 text-slate-300 dark:text-slate-300 light:text-slate-700 transition-colors text-center"
             >
-              Continue Browsing as Guest
+              Continue Browsing
             </button>
           </div>
         </div>

@@ -2,7 +2,8 @@ import { UserAccount, UserData, ThemeMode } from '../types.ts';
 
 const GUEST_ACCOUNT: UserAccount = {
   id: 'guest_user',
-  name: 'Anime Explorer',
+  username: 'AnimeExplorer',
+  name: 'Guest Explorer',
   provider: 'guest',
   createdAt: new Date().toISOString()
 };
@@ -46,12 +47,43 @@ export function getCurrentAccount(): UserAccount {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.CURRENT_ACCOUNT);
     if (raw) {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      // Ensure backwards compatibility with username field
+      if (!parsed.username) {
+        parsed.username = parsed.name || 'AnimeExplorer';
+      }
+      return parsed;
     }
   } catch (err) {
     console.warn('Failed to parse current account, defaulting to guest:', err);
   }
   return GUEST_ACCOUNT;
+}
+
+export function updateUsername(newUsername: string): UserAccount {
+  const account = getCurrentAccount();
+  const trimmed = newUsername.trim() || 'AnimeExplorer';
+  const updatedAccount: UserAccount = {
+    ...account,
+    username: trimmed
+  };
+
+  try {
+    localStorage.setItem(STORAGE_KEYS.CURRENT_ACCOUNT, JSON.stringify(updatedAccount));
+
+    // Update in saved accounts list if present
+    const rawList = localStorage.getItem(STORAGE_KEYS.ACCOUNTS_LIST);
+    if (rawList) {
+      const list: UserAccount[] = JSON.parse(rawList);
+      const updatedList = list.map(a => a.id === updatedAccount.id ? updatedAccount : a);
+      localStorage.setItem(STORAGE_KEYS.ACCOUNTS_LIST, JSON.stringify(updatedList));
+    }
+  } catch (err) {
+    console.warn('Failed to save updated username:', err);
+  }
+
+  notifyListeners();
+  return updatedAccount;
 }
 
 export function getUserData(accountId?: string): UserData {
@@ -134,20 +166,45 @@ export function setThemeMode(theme: ThemeMode): void {
   applyThemeClass(theme);
 }
 
+// Keep a persistent media query listener for system theme changes
+let systemThemeMediaQuery: MediaQueryList | null = null;
+let systemThemeHandler: ((e: MediaQueryListEvent) => void) | null = null;
+
 export function applyThemeClass(theme: ThemeMode): void {
+  if (typeof window === 'undefined') return;
   const root = document.documentElement;
+  
+  if (!systemThemeMediaQuery) {
+    systemThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    systemThemeHandler = () => {
+      const currentTheme = getUserData().theme;
+      if (currentTheme === 'system') {
+        applyThemeClass('system');
+      }
+    };
+    try {
+      systemThemeMediaQuery.addEventListener('change', systemThemeHandler);
+    } catch {
+      // Fallback for older browsers
+      systemThemeMediaQuery.addListener(systemThemeHandler);
+    }
+  }
+
   let isDark = true;
   if (theme === 'system') {
-    isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    isDark = systemThemeMediaQuery.matches;
   } else {
     isDark = theme === 'dark';
   }
+
   if (isDark) {
     root.classList.add('dark');
     root.classList.remove('light');
+    root.style.colorScheme = 'dark';
   } else {
     root.classList.remove('dark');
     root.classList.add('light');
+    root.style.colorScheme = 'light';
   }
 }
 
@@ -206,37 +263,80 @@ export function migrateGuestDataToAccount(targetAccountId: string): {
   };
 }
 
-export function loginWithEmail(email: string, customName?: string): UserAccount {
+export function loginWithEmail(email: string, customUsername?: string): UserAccount {
   const cleanEmail = email.trim().toLowerCase();
-  const name = customName?.trim() || cleanEmail.split('@')[0] || 'Explorer';
+  const username = customUsername?.trim() || cleanEmail.split('@')[0] || 'AnimeExplorer';
   const id = `user_${btoa(cleanEmail).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16)}`;
   
   const account: UserAccount = {
     id,
-    name,
+    username,
+    name: cleanEmail.split('@')[0],
     email: cleanEmail,
     provider: 'email',
     createdAt: new Date().toISOString()
   };
 
-  localStorage.setItem(STORAGE_KEYS.CURRENT_ACCOUNT, JSON.stringify(account));
-  notifyListeners();
+  saveAccountAndSession(account);
   return account;
 }
 
-export function loginWithProvider(provider: 'google' | 'apple', email: string, name: string): UserAccount {
-  const id = `${provider}_${btoa(email).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16)}`;
+export function loginWithProvider(
+  provider: 'google' | 'apple',
+  email: string,
+  providerName: string,
+  customUsername?: string
+): UserAccount {
+  const cleanEmail = email.trim().toLowerCase();
+  const defaultUsername = customUsername?.trim() || cleanEmail.split('@')[0] || 'AnimeExplorer';
+  const id = `${provider}_${btoa(cleanEmail).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16)}`;
+  
   const account: UserAccount = {
     id,
-    name,
-    email,
+    username: defaultUsername,
+    name: providerName || (provider === 'google' ? 'Google Account' : 'Apple Account'),
+    email: cleanEmail,
     provider,
     createdAt: new Date().toISOString()
   };
 
-  localStorage.setItem(STORAGE_KEYS.CURRENT_ACCOUNT, JSON.stringify(account));
-  notifyListeners();
+  saveAccountAndSession(account);
   return account;
+}
+
+function saveAccountAndSession(account: UserAccount) {
+  try {
+    localStorage.setItem(STORAGE_KEYS.CURRENT_ACCOUNT, JSON.stringify(account));
+    
+    // Also save in accounts list for fast identity switching
+    const rawList = localStorage.getItem(STORAGE_KEYS.ACCOUNTS_LIST);
+    let list: UserAccount[] = [];
+    if (rawList) {
+      try {
+        list = JSON.parse(rawList);
+      } catch {
+        list = [];
+      }
+    }
+    const filtered = list.filter(a => a.id !== account.id);
+    filtered.push(account);
+    localStorage.setItem(STORAGE_KEYS.ACCOUNTS_LIST, JSON.stringify(filtered));
+  } catch (err) {
+    console.warn('Failed to persist session:', err);
+  }
+  notifyListeners();
+}
+
+export function getSavedAccounts(): UserAccount[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.ACCOUNTS_LIST);
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch {
+    // ignore
+  }
+  return [];
 }
 
 export function switchAccount(account: UserAccount): void {

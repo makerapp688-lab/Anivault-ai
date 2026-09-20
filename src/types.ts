@@ -33,10 +33,12 @@ export interface Anime {
   alternateTitle: string | null;
   synopsis: string;
   releaseYear: number;
-  status: 'Completed' | 'Ongoing';
-  type: 'TV' | 'Movie';
+  status: 'Completed' | 'Ongoing' | 'Upcoming';
+  type: 'TV' | 'Movie' | 'Collection';
   genres: string[];
   artwork: Artwork;
+  totalEpisodes?: number;
+  totalSeasons?: number;
   providers: {
     raretoonIndia: RareToonProviderInfo;
   };
@@ -63,7 +65,8 @@ export type ThemeMode = 'dark' | 'light' | 'system';
 
 export interface UserAccount {
   id: string;
-  name: string;
+  username: string; // Chosen AniVault username
+  name: string;     // Provider account identity (e.g. Apple ID Name, Google account)
   email?: string;
   avatar?: string;
   provider: 'guest' | 'google' | 'apple' | 'email';

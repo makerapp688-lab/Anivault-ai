@@ -1,10 +1,11 @@
 import React from 'react';
-import { Home, Compass, Bookmark, Heart, User, Check } from 'lucide-react';
+import { Home, Compass, Bookmark, Heart, Check, Scale, User } from 'lucide-react';
 import { useUserData } from '../hooks/useUserData.ts';
+import { NavTabType } from './Navbar.tsx';
 
 interface MobileBottomNavProps {
-  activeTab: 'browse' | 'watchlist' | 'favorites' | 'completed';
-  setActiveTab: (tab: 'browse' | 'watchlist' | 'favorites' | 'completed') => void;
+  activeTab: NavTabType;
+  setActiveTab: (tab: NavTabType) => void;
   onOpenAuth: () => void;
   onScrollToCategories: () => void;
 }
@@ -18,7 +19,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   const { userData, account, isGuest } = useUserData();
 
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-slate-950/95 dark:bg-slate-950/95 light:bg-white/95 backdrop-blur-lg border-t border-slate-800/80 dark:border-slate-800/80 light:border-slate-200 px-3 py-2 transition-colors safe-area-pb">
+    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-slate-950/95 dark:bg-slate-950/95 light:bg-white/95 backdrop-blur-lg border-t border-slate-800/80 dark:border-slate-800/80 light:border-slate-200 px-2 py-1.5 transition-colors safe-area-pb">
       <div className="flex items-center justify-around">
         <button
           type="button"
@@ -27,24 +28,11 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           className={`flex flex-col items-center justify-center p-1 rounded-xl transition-colors ${
             activeTab === 'browse'
               ? 'text-rose-500 font-bold'
-              : 'text-slate-400 hover:text-slate-200'
+              : 'text-slate-400 hover:text-slate-200 dark:text-slate-400 light:text-slate-600'
           }`}
         >
           <Home className="w-5 h-5" />
           <span className="text-[10px] mt-0.5">Browse</span>
-        </button>
-
-        <button
-          type="button"
-          id="mobile-nav-discover"
-          onClick={() => {
-            setActiveTab('browse');
-            onScrollToCategories();
-          }}
-          className="flex flex-col items-center justify-center p-1 rounded-xl text-slate-400 hover:text-slate-200 transition-colors"
-        >
-          <Compass className="w-5 h-5" />
-          <span className="text-[10px] mt-0.5">Genres</span>
         </button>
 
         <button
@@ -54,11 +42,11 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           className={`relative flex flex-col items-center justify-center p-1 rounded-xl transition-colors ${
             activeTab === 'watchlist'
               ? 'text-indigo-400 font-bold'
-              : 'text-slate-400 hover:text-slate-200'
+              : 'text-slate-400 hover:text-slate-200 dark:text-slate-400 light:text-slate-600'
           }`}
         >
           <Bookmark className="w-5 h-5" />
-          <span className="text-[10px] mt-0.5">Watch Later</span>
+          <span className="text-[10px] mt-0.5">Watchlist</span>
           {userData.watchlist.length > 0 && (
             <span className="absolute top-0 right-1 w-4 h-4 rounded-full bg-indigo-600 text-[9px] font-bold text-white flex items-center justify-center">
               {userData.watchlist.length}
@@ -73,7 +61,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           className={`relative flex flex-col items-center justify-center p-1 rounded-xl transition-colors ${
             activeTab === 'favorites'
               ? 'text-rose-500 font-bold'
-              : 'text-slate-400 hover:text-slate-200'
+              : 'text-slate-400 hover:text-slate-200 dark:text-slate-400 light:text-slate-600'
           }`}
         >
           <Heart className="w-5 h-5" />
@@ -87,31 +75,32 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
 
         <button
           type="button"
-          id="mobile-nav-completed"
-          onClick={() => setActiveTab('completed')}
-          className={`relative flex flex-col items-center justify-center p-1 rounded-xl transition-colors ${
-            activeTab === 'completed'
-              ? 'text-emerald-400 font-bold'
-              : 'text-slate-400 hover:text-slate-200'
+          id="mobile-nav-compare"
+          onClick={() => setActiveTab('compare')}
+          className={`flex flex-col items-center justify-center p-1 rounded-xl transition-colors ${
+            activeTab === 'compare'
+              ? 'text-rose-500 font-bold'
+              : 'text-slate-400 hover:text-slate-200 dark:text-slate-400 light:text-slate-600'
           }`}
         >
-          <Check className="w-5 h-5" />
-          <span className="text-[10px] mt-0.5">Watched</span>
-          {userData.completed.length > 0 && (
-            <span className="absolute top-0 right-1 w-4 h-4 rounded-full bg-emerald-600 text-[9px] font-bold text-white flex items-center justify-center">
-              {userData.completed.length}
-            </span>
-          )}
+          <Scale className="w-5 h-5" />
+          <span className="text-[10px] mt-0.5">Compare</span>
         </button>
 
         <button
           type="button"
           id="mobile-nav-account"
-          onClick={onOpenAuth}
-          className="flex flex-col items-center justify-center p-1 rounded-xl text-slate-400 hover:text-slate-200 transition-colors"
+          onClick={() => setActiveTab('account')}
+          className={`flex flex-col items-center justify-center p-1 rounded-xl transition-colors ${
+            activeTab === 'account'
+              ? 'text-rose-500 font-bold'
+              : 'text-slate-400 hover:text-slate-200 dark:text-slate-400 light:text-slate-600'
+          }`}
         >
           <User className="w-5 h-5" />
-          <span className="text-[10px] mt-0.5">{isGuest ? 'Guest' : 'Profile'}</span>
+          <span className="text-[10px] mt-0.5 max-w-[50px] truncate">
+            {account.username || (isGuest ? 'Guest' : 'Account')}
+          </span>
         </button>
       </div>
     </nav>

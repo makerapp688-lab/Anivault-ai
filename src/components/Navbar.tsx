@@ -1,50 +1,36 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Sparkles,
   Database,
   ExternalLink,
-  Dice5,
-  Sun,
-  Moon,
-  Monitor,
-  User,
-  Shield,
-  Layers,
-  Heart,
   Bookmark,
-  Check
+  Heart,
+  Check,
+  Scale,
+  User
 } from 'lucide-react';
 import { RARETOON_BASE_URL, RARETOON_PROVIDER_NAME } from '../utils/provider.ts';
 import { useUserData } from '../hooks/useUserData.ts';
-import { ThemeMode } from '../types.ts';
+
+export type NavTabType = 'browse' | 'watchlist' | 'favorites' | 'completed' | 'compare' | 'account';
 
 interface NavbarProps {
   onOpenStats: () => void;
-  onOpenSurprise: () => void;
-  onOpenAuth: () => void;
-  activeTab: 'browse' | 'watchlist' | 'favorites' | 'completed';
-  setActiveTab: (tab: 'browse' | 'watchlist' | 'favorites' | 'completed') => void;
+  activeTab: NavTabType;
+  setActiveTab: (tab: NavTabType) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenStats,
-  onOpenSurprise,
-  onOpenAuth,
   activeTab,
   setActiveTab
 }) => {
-  const { account, userData, setTheme, isGuest } = useUserData();
-  const [showThemeMenu, setShowThemeMenu] = useState(false);
-
-  const handleThemeChange = (mode: ThemeMode) => {
-    setTheme(mode);
-    setShowThemeMenu(false);
-  };
+  const { account, userData, isGuest } = useUserData();
 
   return (
     <header className="sticky top-0 z-40 w-full bg-slate-950/95 dark:bg-slate-950/95 light:bg-white/95 backdrop-blur-md border-b border-slate-800/80 dark:border-slate-800/80 light:border-slate-200 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
-        {/* Brand / Logo - matching Screenshot 1 */}
+        {/* Brand / Logo */}
         <div
           className="flex items-center gap-3 cursor-pointer select-none"
           onClick={() => setActiveTab('browse')}
@@ -136,10 +122,36 @@ export const Navbar: React.FC<NavbarProps> = ({
               </span>
             )}
           </button>
+          <button
+            type="button"
+            id="nav-tab-compare"
+            onClick={() => setActiveTab('compare')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'compare'
+                ? 'bg-rose-600 text-white shadow-sm'
+                : 'text-slate-300 dark:text-slate-300 light:text-slate-700 hover:text-white hover:bg-slate-800 dark:hover:bg-slate-800 light:hover:bg-slate-200'
+            }`}
+          >
+            <Scale className="w-3.5 h-3.5" />
+            <span>Compare Anime</span>
+          </button>
+          <button
+            type="button"
+            id="nav-tab-account"
+            onClick={() => setActiveTab('account')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'account'
+                ? 'bg-rose-600 text-white shadow-sm'
+                : 'text-slate-300 dark:text-slate-300 light:text-slate-700 hover:text-white hover:bg-slate-800 dark:hover:bg-slate-800 light:hover:bg-slate-200'
+            }`}
+          >
+            <User className="w-3.5 h-3.5" />
+            <span>Account</span>
+          </button>
         </div>
 
-        {/* Right Tools & Account Actions */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* Right Tools: Cleaned up as requested in Rule 6 */}
+        <div className="flex items-center gap-2 sm:gap-3">
           {/* Active Provider Pill - points to new RareToon website */}
           <a
             href={RARETOON_BASE_URL}
@@ -147,109 +159,23 @@ export const Navbar: React.FC<NavbarProps> = ({
             rel="noopener noreferrer"
             id="nav-provider-pill"
             className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-700/50 shadow-sm transition-colors"
-            title="Active Content Provider: RareToon India (New site: rareanimes.mov)"
+            title="Active Content Provider: RareToon India (Site: rareanimes.mov)"
           >
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
             <span>{RARETOON_PROVIDER_NAME}</span>
             <ExternalLink className="w-3 h-3 text-emerald-400" />
           </a>
 
-          {/* Surprise Me / Dice Button */}
-          <button
-            type="button"
-            id="nav-btn-surprise"
-            onClick={onOpenSurprise}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-500/40 shadow-sm transition-all"
-            title="Roll the Dice / Surprise Me with a random anime"
-          >
-            <Dice5 className="w-4 h-4" />
-            <span className="hidden sm:inline">Surprise Me</span>
-          </button>
-
-          {/* Theme Mode Toggle */}
-          <div className="relative">
-            <button
-              type="button"
-              id="nav-btn-theme"
-              onClick={() => setShowThemeMenu(!showThemeMenu)}
-              className="w-8 h-8 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800 light:bg-slate-100 light:hover:bg-slate-200 border border-slate-800 dark:border-slate-800 light:border-slate-300 flex items-center justify-center text-slate-300 dark:text-slate-300 light:text-slate-700 transition-colors"
-              title="Change Theme (Dark, Light, System)"
-            >
-              {userData.theme === 'light' ? (
-                <Sun className="w-4 h-4 text-amber-400" />
-              ) : userData.theme === 'system' ? (
-                <Monitor className="w-4 h-4 text-cyan-400" />
-              ) : (
-                <Moon className="w-4 h-4 text-rose-400" />
-              )}
-            </button>
-
-            {showThemeMenu && (
-              <div
-                className="absolute right-0 mt-2 w-32 bg-slate-900 dark:bg-slate-900 light:bg-white border border-slate-800 dark:border-slate-800 light:border-slate-200 rounded-xl shadow-xl py-1 z-50 text-xs text-slate-200 dark:text-slate-200 light:text-slate-800"
-                onClick={e => e.stopPropagation()}
-              >
-                <button
-                  type="button"
-                  id="theme-opt-dark"
-                  onClick={() => handleThemeChange('dark')}
-                  className={`w-full px-3 py-1.5 text-left flex items-center gap-2 hover:bg-slate-800 dark:hover:bg-slate-800 light:hover:bg-slate-100 ${
-                    userData.theme === 'dark' ? 'text-rose-400 font-bold' : ''
-                  }`}
-                >
-                  <Moon className="w-3.5 h-3.5" />
-                  <span>Dark</span>
-                </button>
-                <button
-                  type="button"
-                  id="theme-opt-light"
-                  onClick={() => handleThemeChange('light')}
-                  className={`w-full px-3 py-1.5 text-left flex items-center gap-2 hover:bg-slate-800 dark:hover:bg-slate-800 light:hover:bg-slate-100 ${
-                    userData.theme === 'light' ? 'text-amber-500 font-bold' : ''
-                  }`}
-                >
-                  <Sun className="w-3.5 h-3.5" />
-                  <span>Light</span>
-                </button>
-                <button
-                  type="button"
-                  id="theme-opt-system"
-                  onClick={() => handleThemeChange('system')}
-                  className={`w-full px-3 py-1.5 text-left flex items-center gap-2 hover:bg-slate-800 dark:hover:bg-slate-800 light:hover:bg-slate-100 ${
-                    userData.theme === 'system' ? 'text-cyan-400 font-bold' : ''
-                  }`}
-                >
-                  <Monitor className="w-3.5 h-3.5" />
-                  <span>System</span>
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Account Profile / Auth Button */}
-          <button
-            type="button"
-            id="nav-btn-account"
-            onClick={onOpenAuth}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800 light:bg-slate-100 light:hover:bg-slate-200 border border-slate-800 dark:border-slate-800 light:border-slate-300 text-slate-200 dark:text-slate-200 light:text-slate-800 transition-colors"
-          >
-            <div className="w-5 h-5 rounded-full bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-[10px] text-rose-400 font-bold">
-              {account.name.charAt(0).toUpperCase()}
-            </div>
-            <span className="hidden sm:inline max-w-[90px] truncate">
-              {isGuest ? 'Guest' : account.name}
-            </span>
-          </button>
-
-          {/* DB Report Modal Button */}
+          {/* Button 4: Production Catalogue - Kept in its exact location */}
           <button
             type="button"
             id="nav-btn-stats"
             onClick={onOpenStats}
-            className="w-8 h-8 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800 light:bg-slate-100 light:hover:bg-slate-200 border border-slate-800 dark:border-slate-800 light:border-slate-300 flex items-center justify-center text-slate-300 hover:text-white dark:text-slate-300 light:text-slate-700 transition-colors"
+            className="h-9 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800 light:bg-slate-100 light:hover:bg-slate-200 border border-slate-800 dark:border-slate-800 light:border-slate-300 flex items-center gap-2 text-xs font-semibold text-slate-200 dark:text-slate-200 light:text-slate-800 hover:text-white transition-colors shadow-sm"
             title="Open AniVault Production Catalogue Report"
           >
-            <Database className="w-4 h-4 text-slate-400 hover:text-rose-400" />
+            <Database className="w-4 h-4 text-rose-500" />
+            <span className="hidden sm:inline">Production Catalogue</span>
           </button>
         </div>
       </div>

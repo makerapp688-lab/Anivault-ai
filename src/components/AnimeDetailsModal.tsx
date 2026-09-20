@@ -38,13 +38,19 @@ export const AnimeDetailsModal: React.FC<AnimeDetailsModalProps> = ({
   onClose,
   onRollAgain
 }) => {
-  if (!anime) return null;
-
   const [activeSeasonNumber, setActiveSeasonNumber] = useState<number>(
-    anime.seasons?.[0]?.seasonNumber || 1
+    anime?.seasons?.[0]?.seasonNumber || 1
   );
 
   const { isFavorite, isWatchlist, isCompleted, toggleFavorite, toggleWatchlist, toggleCompleted } = useUserData();
+
+  React.useEffect(() => {
+    if (anime?.seasons?.[0]?.seasonNumber) {
+      setActiveSeasonNumber(anime.seasons[0].seasonNumber);
+    }
+  }, [anime?.id]);
+
+  if (!anime) return null;
 
   const favorited = isFavorite(anime.id);
   const inWatchlist = isWatchlist(anime.id);
