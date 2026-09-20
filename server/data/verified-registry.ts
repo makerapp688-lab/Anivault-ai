@@ -12,7 +12,7 @@ export const VERIFIED_ANIME_REGISTRY: Record<string, {
   releaseYear?: number;
   alternateTitle?: string;
   artworkUrl?: string;
-  seasonEpisodes: Record<number, number>; // seasonNumber -> episodeCount
+  seasonEpisodes: Record<number, number | null>; // seasonNumber -> episodeCount
   synopsis?: string;
 }> = {
   // 1. Vinland Saga
@@ -394,7 +394,7 @@ export const VERIFIED_ANIME_REGISTRY: Record<string, {
     status: 'Upcoming',
     type: 'TV',
     releaseYear: 2026,
-    seasonEpisodes: { 1: 12 }
+    seasonEpisodes: { 1: null }
   },
 
   // 40. Release That Witch
@@ -402,7 +402,7 @@ export const VERIFIED_ANIME_REGISTRY: Record<string, {
     status: 'Upcoming',
     type: 'TV',
     releaseYear: 2025,
-    seasonEpisodes: { 1: 12 }
+    seasonEpisodes: { 1: null }
   },
 
   // 41. Hoppers (2026 Movie)
@@ -411,5 +411,23 @@ export const VERIFIED_ANIME_REGISTRY: Record<string, {
     type: 'Movie',
     releaseYear: 2026,
     seasonEpisodes: { 1: 1 }
+  },
+
+  // 42. Shin Chan In Very Very Tasty Tasty (Movie)
+  'anivault_rt_shin_chan_in_very_very_tasty_tasty': {
+    status: 'Completed',
+    type: 'Movie',
+    releaseYear: 2013,
+    alternateTitle: 'Crayon Shin-chan: Very Tasty Tasty B-grade Gourmet Survival!!',
+    seasonEpisodes: { 1: 1 }
+  },
+
+  // 43. Doraemon All Seasons
+  'anivault_rt_doraemon_all_seasons_episodes': {
+    status: 'Completed',
+    type: 'TV',
+    releaseYear: 2005,
+    alternateTitle: 'Doraemon Classic All Seasons',
+    seasonEpisodes: { 1: 52 }
   }
 };

@@ -1,18 +1,17 @@
 import React from 'react';
 import {
-  Sparkles,
   Database,
   ExternalLink,
   Bookmark,
-  Heart,
   Check,
   Scale,
   User
 } from 'lucide-react';
 import { RARETOON_BASE_URL, RARETOON_PROVIDER_NAME } from '../utils/provider.ts';
 import { useUserData } from '../hooks/useUserData.ts';
+import { AniVaultLogo } from './AniVaultLogo.tsx';
 
-export type NavTabType = 'browse' | 'watchlist' | 'favorites' | 'completed' | 'compare' | 'account';
+export type NavTabType = 'browse' | 'mylist' | 'completed' | 'compare' | 'account' | 'watchlist' | 'favorites';
 
 interface NavbarProps {
   onOpenStats: () => void;
@@ -27,6 +26,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const { account, userData, isGuest } = useUserData();
 
+  const totalMyListCount = userData.favorites.length + userData.watchlist.length;
+  const isMyListActive = activeTab === 'mylist' || activeTab === 'watchlist' || activeTab === 'favorites';
+
   return (
     <header className="sticky top-0 z-40 w-full bg-slate-950/95 dark:bg-slate-950/95 light:bg-white/95 backdrop-blur-md border-b border-slate-800/80 dark:border-slate-800/80 light:border-slate-200 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
@@ -36,13 +38,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           onClick={() => setActiveTab('browse')}
           id="nav-logo-group"
         >
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-600 to-pink-500 flex items-center justify-center shadow-lg shadow-rose-600/30">
-            <Sparkles className="w-5 h-5 text-white" />
-          </div>
+          <AniVaultLogo size="md" />
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xl font-black text-white dark:text-white light:text-slate-900 tracking-tight font-display">
-                AniVault
+                Ani<span className="text-rose-500">Vault</span>
               </span>
               <span className="px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-500/20 text-rose-400 border border-rose-500/40">
                 CATALOGUE
@@ -68,42 +68,27 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             Browse All
           </button>
+          
+          {/* Combined My List Tab */}
           <button
             type="button"
-            id="nav-tab-watchlist"
-            onClick={() => setActiveTab('watchlist')}
+            id="nav-tab-mylist"
+            onClick={() => setActiveTab('mylist')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'watchlist'
+              isMyListActive
                 ? 'bg-rose-600 text-white shadow-sm'
                 : 'text-slate-300 dark:text-slate-300 light:text-slate-700 hover:text-white hover:bg-slate-800 dark:hover:bg-slate-800 light:hover:bg-slate-200'
             }`}
           >
             <Bookmark className="w-3.5 h-3.5" />
-            <span>Watch Later</span>
-            {userData.watchlist.length > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-500 text-white font-bold">
-                {userData.watchlist.length}
-              </span>
-            )}
-          </button>
-          <button
-            type="button"
-            id="nav-tab-favorites"
-            onClick={() => setActiveTab('favorites')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'favorites'
-                ? 'bg-rose-600 text-white shadow-sm'
-                : 'text-slate-300 dark:text-slate-300 light:text-slate-700 hover:text-white hover:bg-slate-800 dark:hover:bg-slate-800 light:hover:bg-slate-200'
-            }`}
-          >
-            <Heart className="w-3.5 h-3.5" />
-            <span>Favorites</span>
-            {userData.favorites.length > 0 && (
+            <span>My List</span>
+            {totalMyListCount > 0 && (
               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-500 text-white font-bold">
-                {userData.favorites.length}
+                {totalMyListCount}
               </span>
             )}
           </button>
+
           <button
             type="button"
             id="nav-tab-completed"

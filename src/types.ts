@@ -1,3 +1,6 @@
+export type AnimeStatus = 'Completed' | 'Ongoing' | 'Upcoming';
+export type AnimeType = 'TV' | 'Movie' | 'OVA' | 'ONA' | 'Special' | 'Collection';
+
 export interface Artwork {
   verifiedArtworkUrl: string;
   isVerified: boolean;
@@ -29,20 +32,36 @@ export interface Season {
 
 export interface Anime {
   id: string;
+  malId?: number | null;
+  aniListId?: number | null;
   title: string;
   alternateTitle: string | null;
+  japaneseTitle?: string | null;
   synopsis: string;
   releaseYear: number;
-  status: 'Completed' | 'Ongoing' | 'Upcoming';
-  type: 'TV' | 'Movie' | 'Collection';
+  releaseDate?: string | null;
+  status: AnimeStatus;
+  type: AnimeType;
   genres: string[];
   artwork: Artwork;
+  bannerArtwork?: string | null;
   totalEpisodes?: number;
   totalSeasons?: number;
-  providers: {
+  seasonsCount?: number;
+  runtime?: string | null;
+  studios?: string[];
+  source?: string | null;
+  rating?: string | null;
+  score?: number | null;
+  languages?: string[];
+  provider?: string;
+  canonicalProviderUrl?: string;
+  watchUrl?: string;
+  providerId?: string;
+  providers?: {
     raretoonIndia: RareToonProviderInfo;
   };
-  seasons: Season[];
+  seasons?: Season[];
 }
 
 export interface CatalogueStats {
@@ -52,6 +71,14 @@ export interface CatalogueStats {
   placeholderArtworkCount: number;
   exactProviderMappings: number;
   genresBreakdown: Record<string, number>;
+  totalScraped?: number;
+  totalAnime?: number;
+  totalSeasons?: number;
+  totalEpisodes?: number;
+  moviesCount?: number;
+  qualifyingMoviesCount?: number;
+  seriesCount?: number;
+  genreCounts?: Record<string, number>;
 }
 
 export interface SyncStatus {

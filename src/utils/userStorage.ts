@@ -1,11 +1,17 @@
 import { UserAccount, UserData, ThemeMode } from '../types.ts';
 
+export interface StoredAccountRecord extends UserAccount {
+  passwordHash?: string;
+  salt?: string;
+  lastLoginAt: string;
+}
+
 const GUEST_ACCOUNT: UserAccount = {
   id: 'guest_user',
   username: 'AnimeExplorer',
   name: 'Guest Explorer',
   provider: 'guest',
-  createdAt: new Date().toISOString()
+  createdAt: '2025-01-01T00:00:00.000Z'
 };
 
 const DEFAULT_USER_DATA: UserData = {
@@ -16,8 +22,10 @@ const DEFAULT_USER_DATA: UserData = {
   theme: 'dark'
 };
 
-const STORAGE_KEYS = {
+export const STORAGE_KEYS = {
+  CURRENT_SESSION: 'anivault_current_session',
   CURRENT_ACCOUNT: 'anivault_current_account',
+  ACCOUNTS_DB: 'anivault_accounts_db',
   ACCOUNTS_LIST: 'anivault_accounts_list',
   GUEST_DATA: 'anivault_guest_data',
   USER_DATA_PREFIX: 'anivault_user_data_'
@@ -43,53 +51,123 @@ export function subscribeUserStorage(callback: Listener): () => void {
   };
 }
 
+/**
+ * Retrieve the accounts registry from persistent storage
+ */
+export function getAccountsDb(): Record<string, StoredAccountRecord> {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.ACCOUNTS_DB);
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch (err) {
+    console.warn('Failed to parse accounts db:', err);
+  }
+  return {};
+}
+
+function saveAccountsDb(db: Record<string, StoredAccountRecord>): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.ACCOUNTS_DB, JSON.stringify(db));
+  } catch (err) {
+    console.warn('Failed to save accounts db:', err);
+  }
+}
+
+/**
+ * Gets the current active account. Restores session before render.
+ * Guarantees that refreshing or reopening the app keeps the user signed in.
+ */
 export function getCurrentAccount(): UserAccount {
   try {
+    // 1. Check current session token/accountId
+    const sessionRaw = localStorage.getItem(STORAGE_KEYS.CURRENT_SESSION);
+    if (sessionRaw) {
+      const session = JSON.parse(sessionRaw);
+      if (session?.accountId && session.accountId !== 'guest_user') {
+        const db = getAccountsDb();
+        if (db[session.accountId]) {
+          const rec = db[session.accountId];
+          return {
+            id: rec.id,
+            username: rec.username || rec.name || 'AnimeExplorer',
+            name: rec.name,
+            email: rec.email,
+            avatar: rec.avatar,
+            provider: rec.provider,
+            createdAt: rec.createdAt
+          };
+        }
+      }
+    }
+
+    // 2. Check legacy current account key
     const raw = localStorage.getItem(STORAGE_KEYS.CURRENT_ACCOUNT);
     if (raw) {
       const parsed = JSON.parse(raw);
-      // Ensure backwards compatibility with username field
-      if (!parsed.username) {
-        parsed.username = parsed.name || 'AnimeExplorer';
+      if (parsed && parsed.id && parsed.id !== 'guest_user') {
+        if (!parsed.username) {
+          parsed.username = parsed.name || 'AnimeExplorer';
+        }
+        return parsed;
       }
-      return parsed;
     }
   } catch (err) {
-    console.warn('Failed to parse current account, defaulting to guest:', err);
+    console.warn('Failed to get current account:', err);
   }
+
   return GUEST_ACCOUNT;
 }
 
+/**
+ * Update the username and persist it permanently with the user's account
+ */
 export function updateUsername(newUsername: string): UserAccount {
-  const account = getCurrentAccount();
+  const current = getCurrentAccount();
   const trimmed = newUsername.trim() || 'AnimeExplorer';
   const updatedAccount: UserAccount = {
-    ...account,
+    ...current,
     username: trimmed
   };
 
   try {
+    // Update active session and account
     localStorage.setItem(STORAGE_KEYS.CURRENT_ACCOUNT, JSON.stringify(updatedAccount));
 
-    // Update in saved accounts list if present
+    // Update in Accounts DB
+    if (current.id !== 'guest_user') {
+      const db = getAccountsDb();
+      if (db[current.id]) {
+        db[current.id].username = trimmed;
+        saveAccountsDb(db);
+      }
+    }
+
+    // Update in saved accounts list
     const rawList = localStorage.getItem(STORAGE_KEYS.ACCOUNTS_LIST);
     if (rawList) {
       const list: UserAccount[] = JSON.parse(rawList);
-      const updatedList = list.map(a => a.id === updatedAccount.id ? updatedAccount : a);
+      const updatedList = list.map(a => (a.id === updatedAccount.id ? updatedAccount : a));
       localStorage.setItem(STORAGE_KEYS.ACCOUNTS_LIST, JSON.stringify(updatedList));
     }
   } catch (err) {
-    console.warn('Failed to save updated username:', err);
+    console.warn('Failed to update username:', err);
   }
 
   notifyListeners();
   return updatedAccount;
 }
 
+/**
+ * Retrieves isolated UserData for an account
+ */
 export function getUserData(accountId?: string): UserData {
   const currentId = accountId || getCurrentAccount().id;
   try {
-    const key = currentId === 'guest_user' ? STORAGE_KEYS.GUEST_DATA : `${STORAGE_KEYS.USER_DATA_PREFIX}${currentId}`;
+    const key =
+      currentId === 'guest_user'
+        ? STORAGE_KEYS.GUEST_DATA
+        : `${STORAGE_KEYS.USER_DATA_PREFIX}${currentId}`;
     const raw = localStorage.getItem(key);
     if (raw) {
       const parsed = JSON.parse(raw);
@@ -107,10 +185,16 @@ export function getUserData(accountId?: string): UserData {
   return { ...DEFAULT_USER_DATA };
 }
 
+/**
+ * Saves isolated UserData for an account
+ */
 export function saveUserData(data: UserData, accountId?: string): void {
   const currentId = accountId || getCurrentAccount().id;
   try {
-    const key = currentId === 'guest_user' ? STORAGE_KEYS.GUEST_DATA : `${STORAGE_KEYS.USER_DATA_PREFIX}${currentId}`;
+    const key =
+      currentId === 'guest_user'
+        ? STORAGE_KEYS.GUEST_DATA
+        : `${STORAGE_KEYS.USER_DATA_PREFIX}${currentId}`;
     localStorage.setItem(key, JSON.stringify(data));
     notifyListeners();
   } catch (err) {
@@ -151,7 +235,7 @@ export function toggleCompleted(animeId: string): boolean {
 export function addToHistory(animeId: string): void {
   const data = getUserData();
   const filtered = data.history.filter(h => h.animeId !== animeId);
-  const updatedHistory = [{ animeId, timestamp: Date.now() }, ...filtered].slice(0, 20);
+  const updatedHistory = [{ animeId, timestamp: Date.now() }, ...filtered].slice(0, 30);
   saveUserData({ ...data, history: updatedHistory });
 }
 
@@ -166,14 +250,13 @@ export function setThemeMode(theme: ThemeMode): void {
   applyThemeClass(theme);
 }
 
-// Keep a persistent media query listener for system theme changes
 let systemThemeMediaQuery: MediaQueryList | null = null;
 let systemThemeHandler: ((e: MediaQueryListEvent) => void) | null = null;
 
 export function applyThemeClass(theme: ThemeMode): void {
   if (typeof window === 'undefined') return;
   const root = document.documentElement;
-  
+
   if (!systemThemeMediaQuery) {
     systemThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     systemThemeHandler = () => {
@@ -185,7 +268,6 @@ export function applyThemeClass(theme: ThemeMode): void {
     try {
       systemThemeMediaQuery.addEventListener('change', systemThemeHandler);
     } catch {
-      // Fallback for older browsers
       systemThemeMediaQuery.addListener(systemThemeHandler);
     }
   }
@@ -232,11 +314,10 @@ export function migrateGuestDataToAccount(targetAccountId: string): {
   const mergedFavorites = Array.from(new Set([...targetData.favorites, ...guestData.favorites]));
   const mergedWatchlist = Array.from(new Set([...targetData.watchlist, ...guestData.watchlist]));
   const mergedCompleted = Array.from(new Set([...targetData.completed, ...guestData.completed]));
-  
-  // Merge history
+
   const historyMap = new Map<string, number>();
   for (const h of [...targetData.history, ...guestData.history]) {
-    if (!historyMap.has(h.animeId) || (historyMap.get(h.animeId)! < h.timestamp)) {
+    if (!historyMap.has(h.animeId) || historyMap.get(h.animeId)! < h.timestamp) {
       historyMap.set(h.animeId, h.timestamp);
     }
   }
@@ -245,15 +326,18 @@ export function migrateGuestDataToAccount(targetAccountId: string): {
     .sort((a, b) => b.timestamp - a.timestamp)
     .slice(0, 30);
 
-  saveUserData({
-    ...targetData,
-    favorites: mergedFavorites,
-    watchlist: mergedWatchlist,
-    completed: mergedCompleted,
-    history: mergedHistory
-  }, targetAccountId);
+  saveUserData(
+    {
+      ...targetData,
+      favorites: mergedFavorites,
+      watchlist: mergedWatchlist,
+      completed: mergedCompleted,
+      history: mergedHistory
+    },
+    targetAccountId
+  );
 
-  // Clear guest data after successful migration
+  // Reset guest data after migration
   saveUserData({ ...DEFAULT_USER_DATA }, 'guest_user');
 
   return {
@@ -263,52 +347,142 @@ export function migrateGuestDataToAccount(targetAccountId: string): {
   };
 }
 
-export function loginWithEmail(email: string, customUsername?: string): UserAccount {
+/**
+ * Register or Sign In with Email & Password
+ */
+export function authenticateWithEmail(
+  email: string,
+  password?: string,
+  customUsername?: string
+): { success: boolean; account?: UserAccount; error?: string } {
   const cleanEmail = email.trim().toLowerCase();
-  const username = customUsername?.trim() || cleanEmail.split('@')[0] || 'AnimeExplorer';
+  if (!cleanEmail || !cleanEmail.includes('@')) {
+    return { success: false, error: 'Please enter a valid email address.' };
+  }
+
   const id = `user_${btoa(cleanEmail).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16)}`;
-  
-  const account: UserAccount = {
+  const db = getAccountsDb();
+  const existing = db[id];
+
+  if (existing) {
+    // If account exists and password was set, verify password
+    if (existing.passwordHash && password && existing.passwordHash !== password) {
+      return { success: false, error: 'Incorrect password for this account.' };
+    }
+
+    // Update username if explicitly changed
+    if (customUsername?.trim()) {
+      existing.username = customUsername.trim();
+    }
+    existing.lastLoginAt = new Date().toISOString();
+    db[id] = existing;
+    saveAccountsDb(db);
+
+    const userAcc: UserAccount = {
+      id: existing.id,
+      username: existing.username,
+      name: existing.name,
+      email: existing.email,
+      provider: existing.provider,
+      createdAt: existing.createdAt
+    };
+
+    saveSession(userAcc);
+    return { success: true, account: userAcc };
+  }
+
+  // Create new account
+  const defaultUsername = customUsername?.trim() || cleanEmail.split('@')[0] || 'AnimeExplorer';
+  const newAccountRecord: StoredAccountRecord = {
     id,
-    username,
+    username: defaultUsername,
     name: cleanEmail.split('@')[0],
     email: cleanEmail,
+    passwordHash: password || undefined,
     provider: 'email',
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
+    lastLoginAt: new Date().toISOString()
   };
 
-  saveAccountAndSession(account);
-  return account;
+  db[id] = newAccountRecord;
+  saveAccountsDb(db);
+
+  const userAcc: UserAccount = {
+    id: newAccountRecord.id,
+    username: newAccountRecord.username,
+    name: newAccountRecord.name,
+    email: newAccountRecord.email,
+    provider: newAccountRecord.provider,
+    createdAt: newAccountRecord.createdAt
+  };
+
+  saveSession(userAcc);
+  return { success: true, account: userAcc };
 }
 
-export function loginWithProvider(
+/**
+ * Sign In with Verified 3P Provider (Google / Apple)
+ */
+export function authenticateWithProvider(
   provider: 'google' | 'apple',
   email: string,
   providerName: string,
   customUsername?: string
-): UserAccount {
+): { success: boolean; account: UserAccount } {
   const cleanEmail = email.trim().toLowerCase();
-  const defaultUsername = customUsername?.trim() || cleanEmail.split('@')[0] || 'AnimeExplorer';
   const id = `${provider}_${btoa(cleanEmail).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16)}`;
-  
-  const account: UserAccount = {
+  const db = getAccountsDb();
+  const existing = db[id];
+
+  let chosenName = customUsername?.trim();
+  if (!chosenName && existing?.username) {
+    chosenName = existing.username;
+  }
+  if (!chosenName) {
+    chosenName = cleanEmail.split('@')[0] || 'AnimeExplorer';
+  }
+
+  const accountRecord: StoredAccountRecord = {
     id,
-    username: defaultUsername,
-    name: providerName || (provider === 'google' ? 'Google Account' : 'Apple Account'),
+    username: chosenName,
+    name: providerName || (provider === 'google' ? 'Google User' : 'Apple User'),
     email: cleanEmail,
     provider,
-    createdAt: new Date().toISOString()
+    createdAt: existing ? existing.createdAt : new Date().toISOString(),
+    lastLoginAt: new Date().toISOString()
   };
 
-  saveAccountAndSession(account);
-  return account;
+  db[id] = accountRecord;
+  saveAccountsDb(db);
+
+  const userAcc: UserAccount = {
+    id: accountRecord.id,
+    username: accountRecord.username,
+    name: accountRecord.name,
+    email: accountRecord.email,
+    provider: accountRecord.provider,
+    createdAt: accountRecord.createdAt
+  };
+
+  saveSession(userAcc);
+  return { success: true, account: userAcc };
 }
 
-function saveAccountAndSession(account: UserAccount) {
+/**
+ * Save active session securely in localStorage
+ */
+function saveSession(account: UserAccount) {
   try {
+    localStorage.setItem(
+      STORAGE_KEYS.CURRENT_SESSION,
+      JSON.stringify({
+        accountId: account.id,
+        timestamp: Date.now()
+      })
+    );
     localStorage.setItem(STORAGE_KEYS.CURRENT_ACCOUNT, JSON.stringify(account));
-    
-    // Also save in accounts list for fast identity switching
+
+    // Save in accounts list for account switcher
     const rawList = localStorage.getItem(STORAGE_KEYS.ACCOUNTS_LIST);
     let list: UserAccount[] = [];
     if (rawList) {
@@ -329,6 +503,18 @@ function saveAccountAndSession(account: UserAccount) {
 
 export function getSavedAccounts(): UserAccount[] {
   try {
+    const db = getAccountsDb();
+    const accounts = Object.values(db).map(r => ({
+      id: r.id,
+      username: r.username,
+      name: r.name,
+      email: r.email,
+      avatar: r.avatar,
+      provider: r.provider,
+      createdAt: r.createdAt
+    }));
+    if (accounts.length > 0) return accounts;
+
     const raw = localStorage.getItem(STORAGE_KEYS.ACCOUNTS_LIST);
     if (raw) {
       return JSON.parse(raw);
@@ -340,11 +526,35 @@ export function getSavedAccounts(): UserAccount[] {
 }
 
 export function switchAccount(account: UserAccount): void {
-  localStorage.setItem(STORAGE_KEYS.CURRENT_ACCOUNT, JSON.stringify(account));
+  saveSession(account);
+}
+
+/**
+ * Explicit logout ending the session and returning to Guest
+ */
+export function logoutToGuest(): void {
+  try {
+    localStorage.setItem(
+      STORAGE_KEYS.CURRENT_SESSION,
+      JSON.stringify({
+        accountId: 'guest_user',
+        timestamp: Date.now()
+      })
+    );
+    localStorage.setItem(STORAGE_KEYS.CURRENT_ACCOUNT, JSON.stringify(GUEST_ACCOUNT));
+  } catch (err) {
+    console.warn('Failed to log out:', err);
+  }
   notifyListeners();
 }
 
-export function logoutToGuest(): void {
-  localStorage.setItem(STORAGE_KEYS.CURRENT_ACCOUNT, JSON.stringify(GUEST_ACCOUNT));
-  notifyListeners();
-}
+// Backwards compatibility aliases
+export const loginWithEmail = (email: string, customUsername?: string) =>
+  authenticateWithEmail(email, undefined, customUsername).account!;
+
+export const loginWithProvider = (
+  provider: 'google' | 'apple',
+  email: string,
+  providerName: string,
+  customUsername?: string
+) => authenticateWithProvider(provider, email, providerName, customUsername).account;

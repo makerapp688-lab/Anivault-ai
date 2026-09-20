@@ -166,7 +166,7 @@ export const SurpriseMeModal: React.FC<SurpriseMeModalProps> = ({
                 </button>
               </div>
 
-              {watchResolution && (
+              {watchResolution && watchResolution.url && (
                 <div className="text-center pt-1">
                   <a
                     href={watchResolution.url}

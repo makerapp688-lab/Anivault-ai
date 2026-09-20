@@ -3,6 +3,15 @@ import path from 'path';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { runIngestion } from './server/raretoon-ingest.js';
+import { fullImporter } from './server/raretoon-full-importer.js';
+import { ArtworkManager } from './server/artwork-manager.js';
+import {
+  scanArtwork,
+  repairMissingArtwork,
+  retryFailedArtwork,
+  runFullArtworkAuditBatch,
+  getArtworkManagerStatus
+} from './server/artwork-pipeline.js';
 
 const app = express();
 const PORT = 3000;
@@ -167,7 +176,7 @@ app.post('/api/sync', async (req, res) => {
       const report = await runIngestion();
       loadCatalogue();
       lastSyncTimestamp = new Date().toISOString();
-      syncMessage = `Sync complete. ${report.totalUniqueAnime} anime catalogued.`;
+      syncMessage = `Sync complete. ${report.finalCatalogueCount} anime catalogued.`;
     } catch (err: any) {
       console.error('[Sync Error]', err);
       syncMessage = `Sync failed: ${err.message}`;
@@ -188,6 +197,91 @@ app.get('/api/sync-status', (req, res) => {
   });
 });
 
+// FULL CATALOGUE IMPORT SYSTEM ROUTES
+app.post('/api/full-import/start', async (req, res) => {
+  const result = await fullImporter.startImport();
+  loadCatalogue();
+  res.json(result);
+});
+
+app.post('/api/full-import/pause', (req, res) => {
+  const result = fullImporter.pauseImport();
+  res.json(result);
+});
+
+app.post('/api/full-import/reset', (req, res) => {
+  fullImporter.resetState();
+  res.json({ status: 'reset', state: fullImporter.getState() });
+});
+
+app.get('/api/full-import/status', (req, res) => {
+  loadCatalogue();
+  res.json({
+    report: fullImporter.getReport(),
+    state: fullImporter.getState(),
+    totalProductionAnime: catalogueCache.length
+  });
+});
+
+// ARTWORK MANAGER API ROUTES
+app.get('/api/artwork/manager-status', async (req, res) => {
+  try {
+    const report = await getArtworkManagerStatus();
+    res.json(report);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/artwork/scan', async (req, res) => {
+  try {
+    const report = await scanArtwork();
+    loadCatalogue();
+    res.json({ status: 'completed', report });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/artwork/repair', async (req, res) => {
+  try {
+    const report = await repairMissingArtwork(25);
+    loadCatalogue();
+    res.json({ status: 'completed', report });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/artwork/retry-failed', async (req, res) => {
+  try {
+    const report = await retryFailedArtwork();
+    loadCatalogue();
+    res.json({ status: 'completed', report });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/artwork/audit', async (req, res) => {
+  try {
+    const report = await runFullArtworkAuditBatch(50);
+    loadCatalogue();
+    res.json({ status: 'completed', report });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/artwork/audit', async (req, res) => {
+  try {
+    const report = await getArtworkManagerStatus();
+    res.json(report);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
@@ -205,6 +299,10 @@ async function startServer() {
 
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`AniVault server listening at http://0.0.0.0:${PORT}`);
+    // Automatic ArtworkManager initialization & health check
+    ArtworkManager.scanAndRepairCatalogue(50)
+      .then(() => loadCatalogue())
+      .catch(err => console.error('[ArtworkManager Initialization Error]', err));
   });
 }
 

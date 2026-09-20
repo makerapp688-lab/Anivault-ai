@@ -28,6 +28,8 @@ import {
   switchAccount
 } from '../utils/userStorage.ts';
 import { ThemeMode, UserAccount } from '../types.ts';
+import { AniVaultLogo } from './AniVaultLogo.tsx';
+import { AdminArtworkDashboard } from './AdminArtworkDashboard.tsx';
 
 interface AccountViewProps {
   onOpenAuthModal: () => void;
@@ -36,6 +38,7 @@ interface AccountViewProps {
 export const AccountView: React.FC<AccountViewProps> = ({ onOpenAuthModal }) => {
   const { account, userData, isGuest } = useUserData();
   const [editingUsername, setEditingUsername] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(true);
   const [usernameInput, setUsernameInput] = useState(account.username || 'AnimeExplorer');
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [migrationStats, setMigrationStats] = useState<{
@@ -72,13 +75,16 @@ export const AccountView: React.FC<AccountViewProps> = ({ onOpenAuthModal }) => 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8" id="account-view-container">
       {/* Title */}
-      <div className="pb-4 border-b border-slate-800 dark:border-slate-800 light:border-slate-200">
-        <h1 className="text-2xl sm:text-3xl font-black text-white dark:text-white light:text-slate-900 tracking-tight">
-          Account &amp; Preferences
-        </h1>
-        <p className="text-xs text-slate-400 dark:text-slate-400 light:text-slate-500 mt-1">
-          Manage your AniVault username, persistent profile authentication, and display theme
-        </p>
+      <div className="pb-4 border-b border-slate-800 dark:border-slate-800 light:border-slate-200 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-black text-white dark:text-white light:text-slate-900 tracking-tight">
+            Account &amp; Preferences
+          </h1>
+          <p className="text-xs text-slate-400 dark:text-slate-400 light:text-slate-500 mt-1">
+            Manage your AniVault username, persistent profile authentication, and display theme
+          </p>
+        </div>
+        <AniVaultLogo size="lg" className="hidden sm:inline-flex" />
       </div>
 
       {/* Profile Overview Card */}
@@ -221,6 +227,30 @@ export const AccountView: React.FC<AccountViewProps> = ({ onOpenAuthModal }) => 
             <div className="text-xs text-slate-400 mt-1">Watched</div>
           </div>
         </div>
+      </div>
+
+      {/* Admin Mode Toggle & Admin Artwork Manager */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between px-1">
+          <div className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+            <Shield className="w-4 h-4 text-amber-500" />
+            <span>Administrator Console Controls</span>
+          </div>
+          <button
+            type="button"
+            id="btn-toggle-admin-mode"
+            onClick={() => setIsAdmin(!isAdmin)}
+            className={`px-3 py-1 rounded-lg text-xs font-bold border transition-colors ${
+              isAdmin
+                ? 'bg-amber-950/80 border-amber-700/60 text-amber-300'
+                : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
+            }`}
+          >
+            {isAdmin ? 'Admin Mode: ACTIVE' : 'Admin Mode: HIDDEN'}
+          </button>
+        </div>
+
+        {isAdmin && <AdminArtworkDashboard isAdmin={isAdmin} />}
       </div>
 
       {/* Theme Settings Card (Requirement 5) */}

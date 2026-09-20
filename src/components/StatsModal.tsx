@@ -1,7 +1,23 @@
-import React from 'react';
-import { X, CheckCircle2, Database, ShieldCheck, RefreshCw, Layers, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import {
+  X,
+  CheckCircle2,
+  Database,
+  ShieldCheck,
+  RefreshCw,
+  Layers,
+  ExternalLink,
+  Play,
+  Pause,
+  RotateCcw,
+  Sparkles,
+  Film
+} from 'lucide-react';
 import { CatalogueStats } from '../types.ts';
 import { RARETOON_BASE_URL, RARETOON_PROVIDER_NAME } from '../utils/provider.ts';
+import { AniVaultLogo } from './AniVaultLogo.tsx';
+import { FullCatalogueImporter } from './FullCatalogueImporter.tsx';
+import { AdminArtworkDashboard } from './AdminArtworkDashboard.tsx';
 
 interface StatsModalProps {
   isOpen: boolean;
@@ -20,7 +36,71 @@ export const StatsModal: React.FC<StatsModalProps> = ({
   isSyncing,
   onTriggerSync
 }) => {
+  const [importReport, setImportReport] = useState<any>(null);
+  const [importState, setImportState] = useState<any>(null);
+  const [isImportLoading, setIsImportLoading] = useState<boolean>(false);
+
+  const fetchImportStatus = async () => {
+    try {
+      const res = await fetch('/api/full-import/status');
+      if (res.ok) {
+        const data = await res.json();
+        setImportReport(data.report);
+        setImportState(data.state);
+      }
+    } catch (err) {
+      console.error('Failed to fetch full import status:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    fetchImportStatus();
+    const interval = setInterval(fetchImportStatus, 3000);
+    return () => clearInterval(interval);
+  }, [isOpen]);
+
+  const handleStartImport = async () => {
+    setIsImportLoading(true);
+    try {
+      await fetch('/api/full-import/start', { method: 'POST' });
+      await fetchImportStatus();
+    } catch (err) {
+      console.error('Failed to start import:', err);
+    } finally {
+      setIsImportLoading(false);
+    }
+  };
+
+  const handlePauseImport = async () => {
+    setIsImportLoading(true);
+    try {
+      await fetch('/api/full-import/pause', { method: 'POST' });
+      await fetchImportStatus();
+    } catch (err) {
+      console.error('Failed to pause import:', err);
+    } finally {
+      setIsImportLoading(false);
+    }
+  };
+
+  const handleResetImport = async () => {
+    if (!window.confirm('Reset Full Import checkpoint state? Existing production catalogue will remain safe.')) return;
+    setIsImportLoading(true);
+    try {
+      await fetch('/api/full-import/reset', { method: 'POST' });
+      await fetchImportStatus();
+    } catch (err) {
+      console.error('Failed to reset import:', err);
+    } finally {
+      setIsImportLoading(false);
+    }
+  };
+
   if (!isOpen) return null;
+
+  const status = importState?.importStatus || 'idle';
+  const isRunning = status === 'running';
 
   return (
     <div
@@ -29,20 +109,20 @@ export const StatsModal: React.FC<StatsModalProps> = ({
       id="stats-modal-overlay"
     >
       <div
-        className="relative w-full max-w-2xl bg-slate-900 dark:bg-slate-900 light:bg-white border border-slate-800 dark:border-slate-800 light:border-slate-200 rounded-2xl shadow-2xl overflow-hidden my-auto max-h-[90vh] flex flex-col transition-colors"
+        className="relative w-full max-w-3xl bg-slate-900 dark:bg-slate-900 light:bg-white border border-slate-800 dark:border-slate-800 light:border-slate-200 rounded-2xl shadow-2xl overflow-hidden my-auto max-h-[90vh] flex flex-col transition-colors"
         onClick={e => e.stopPropagation()}
         id="stats-modal-content"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 bg-slate-950/90 dark:bg-slate-950/90 light:bg-slate-100 border-b border-slate-800 dark:border-slate-800 light:border-slate-200">
-          <div className="flex items-center gap-2">
-            <Database className="w-5 h-5 text-rose-500" />
+          <div className="flex items-center gap-3">
+            <AniVaultLogo size="sm" />
             <div>
               <h2 className="text-base font-bold text-white dark:text-white light:text-slate-900 tracking-tight">
-                AniVault Production Catalogue Report
+                AniVault Catalogue &amp; Full Import Engine
               </h2>
               <p className="text-xs text-slate-400 dark:text-slate-400 light:text-slate-600">
-                Verified Data &amp; RareToon India Provider Status
+                Resumable Full RareToon Import &amp; Database Verification
               </p>
             </div>
           </div>
@@ -58,14 +138,15 @@ export const StatsModal: React.FC<StatsModalProps> = ({
 
         {/* Content */}
         <div className="p-5 md:p-6 overflow-y-auto space-y-6 text-slate-200 dark:text-slate-200 light:text-slate-800">
-          {/* Key Metrics Grid - NOTE: "Verified Art" label is strictly removed per mandate */}
+          
+          {/* Key Metrics Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="p-3.5 bg-slate-950/60 dark:bg-slate-950/60 light:bg-slate-50 border border-slate-800 dark:border-slate-800 light:border-slate-200 rounded-xl flex flex-col justify-between">
               <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                Unique Anime
+                Production Catalogue
               </span>
               <span className="text-2xl font-black text-rose-500 mt-1">
-                {stats?.totalUniqueAnime || totalAnime}
+                {importReport?.finalCatalogueCount || stats?.totalUniqueAnime || totalAnime}
               </span>
               <span className="text-[10px] text-emerald-400 font-medium flex items-center gap-1 mt-1">
                 <CheckCircle2 className="w-3 h-3" /> Factual count
@@ -74,41 +155,46 @@ export const StatsModal: React.FC<StatsModalProps> = ({
 
             <div className="p-3.5 bg-slate-950/60 dark:bg-slate-950/60 light:bg-slate-50 border border-slate-800 dark:border-slate-800 light:border-slate-200 rounded-xl flex flex-col justify-between">
               <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                Scraped URLs
+                Pages Scanned
               </span>
               <span className="text-2xl font-black text-cyan-400 mt-1">
-                {stats?.totalRareToonUrlsScraped || 418}
+                {importReport?.pagesScanned || 0}
               </span>
               <span className="text-[10px] text-slate-400 mt-1">
-                Sitemap &amp; archives
-              </span>
-            </div>
-
-            {/* Replaced 'Verified Art' with Dub Languages & Audio coverage */}
-            <div className="p-3.5 bg-slate-950/60 dark:bg-slate-950/60 light:bg-slate-50 border border-slate-800 dark:border-slate-800 light:border-slate-200 rounded-xl flex flex-col justify-between">
-              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                Dub Audio Formats
-              </span>
-              <span className="text-2xl font-black text-emerald-400 mt-1">
-                3
-              </span>
-              <span className="text-[10px] text-emerald-400 mt-1">
-                Hindi, Dual, Multi
+                Pagination &amp; Sitemaps
               </span>
             </div>
 
             <div className="p-3.5 bg-slate-950/60 dark:bg-slate-950/60 light:bg-slate-50 border border-slate-800 dark:border-slate-800 light:border-slate-200 rounded-xl flex flex-col justify-between">
               <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                Deep-Links
+                Total Discovered
               </span>
               <span className="text-2xl font-black text-amber-400 mt-1">
-                {stats?.exactProviderMappings || totalAnime}
+                {importReport?.totalDiscovered || 0}
               </span>
               <span className="text-[10px] text-amber-400 mt-1">
-                Verified destinations
+                Provider URLs
+              </span>
+            </div>
+
+            <div className="p-3.5 bg-slate-950/60 dark:bg-slate-950/60 light:bg-slate-50 border border-slate-800 dark:border-slate-800 light:border-slate-200 rounded-xl flex flex-col justify-between">
+              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                Anime Movies
+              </span>
+              <span className="text-2xl font-black text-emerald-400 mt-1">
+                {importReport?.moviesCount || stats?.moviesCount || 193}
+              </span>
+              <span className="text-[10px] text-emerald-400 mt-1">
+                Verified Movie Media
               </span>
             </div>
           </div>
+
+          {/* ADMIN ARTWORK MANAGER DASHBOARD */}
+          <AdminArtworkDashboard onCatalogueUpdated={onTriggerSync} />
+
+          {/* FULL CATALOGUE IMPORT & ARTWORK REPAIR COMPONENT */}
+          <FullCatalogueImporter onCatalogueUpdated={onTriggerSync} />
 
           {/* Provider Architecture */}
           <div className="p-4 bg-slate-950/70 dark:bg-slate-950/70 light:bg-slate-50 border border-slate-800 dark:border-slate-800 light:border-slate-200 rounded-xl space-y-2">
@@ -149,14 +235,6 @@ export const StatsModal: React.FC<StatsModalProps> = ({
                   </div>
                 ))}
             </div>
-          </div>
-
-          {/* Catalogue Target Note */}
-          <div className="p-4 bg-rose-950/30 dark:bg-rose-950/30 light:bg-rose-50 border border-rose-900/50 dark:border-rose-900/50 light:border-rose-200 rounded-xl text-xs space-y-1.5 text-slate-300 dark:text-slate-300 light:text-slate-700">
-            <div className="font-semibold text-rose-400 dark:text-rose-400 light:text-rose-700">Provider &amp; Integrity Compliance</div>
-            <p className="leading-relaxed text-slate-400 dark:text-slate-400 light:text-slate-600">
-              AniVault catalogues verified anime from the active RareToon India provider. All links resolve to verified pages on the new RareToon India website (<code className="text-slate-200 dark:text-slate-200 light:text-slate-800">rareanimes.mov</code>) with honest fallback to the new RareToon homepage. Zero fake anime or fabricated deep links exist in the system.
-            </p>
           </div>
         </div>
 

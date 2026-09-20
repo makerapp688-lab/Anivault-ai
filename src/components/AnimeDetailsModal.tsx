@@ -70,7 +70,9 @@ export const AnimeDetailsModal: React.FC<AnimeDetailsModalProps> = ({
   const watchResolution = resolveWatchUrl(anime, activeSeasonNumber);
 
   const handleOpenToWatch = () => {
-    window.open(watchResolution.url, '_blank', 'noopener,noreferrer');
+    if (watchResolution.url) {
+      window.open(watchResolution.url, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (
@@ -262,24 +264,33 @@ export const AnimeDetailsModal: React.FC<AnimeDetailsModalProps> = ({
 
               {/* MANDATORY REQUIREMENT 2: OPEN THIS ANIME TO WATCH */}
               <div className="pt-2">
-                <button
-                  type="button"
-                  id="btn-open-anime-to-watch"
-                  onClick={handleOpenToWatch}
-                  className="w-full py-3 px-5 rounded-xl font-bold text-sm md:text-base bg-gradient-to-r from-rose-600 via-rose-500 to-pink-500 hover:from-rose-500 hover:to-pink-400 text-white shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 transition-all transform active:scale-[0.98]"
-                >
-                  <Play className="w-5 h-5 fill-current" />
-                  <span>OPEN THIS ANIME TO WATCH</span>
-                  <ExternalLink className="w-4 h-4 ml-1 opacity-80" />
-                </button>
-                <div className="flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-400 light:text-slate-500 mt-1.5 px-1 font-mono">
-                  <span className="truncate max-w-[260px] md:max-w-md">
-                    Destination: {watchResolution.url}
-                  </span>
-                  <span className={watchResolution.isExact ? 'text-emerald-400 font-semibold' : 'text-amber-400'}>
-                    {watchResolution.isExact ? '✓ Exact Link' : 'Fallback: Homepage'}
-                  </span>
-                </div>
+                {watchResolution.isAvailable && watchResolution.url ? (
+                  <>
+                    <button
+                      type="button"
+                      id="btn-open-anime-to-watch"
+                      onClick={handleOpenToWatch}
+                      className="w-full py-3 px-5 rounded-xl font-bold text-sm md:text-base bg-gradient-to-r from-rose-600 via-rose-500 to-pink-500 hover:from-rose-500 hover:to-pink-400 text-white shadow-lg shadow-rose-600/30 flex items-center justify-center gap-2 transition-all transform active:scale-[0.98] cursor-pointer"
+                    >
+                      <Play className="w-5 h-5 fill-current" />
+                      <span>OPEN THIS ANIME TO WATCH</span>
+                      <ExternalLink className="w-4 h-4 ml-1 opacity-80" />
+                    </button>
+                    <div className="flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-400 light:text-slate-500 mt-1.5 px-1 font-mono">
+                      <span className="truncate max-w-[260px] md:max-w-md">
+                        Destination: {watchResolution.url}
+                      </span>
+                      <span className="text-emerald-400 font-semibold">
+                        ✓ Verified Match
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-800 text-center space-y-1">
+                    <p className="text-xs font-bold text-slate-400">Stream Not Available on RareAnimes</p>
+                    <p className="text-[11px] text-slate-500">This specific title does not have a verified direct streaming link on RareAnimes.</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -354,34 +365,49 @@ export const AnimeDetailsModal: React.FC<AnimeDetailsModalProps> = ({
                         <span className="ml-2 font-normal text-cyan-400">({currentSeasonEpisodes} Episodes)</span>
                       )}
                     </span>
-                    <a
-                      href={watchResolution.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs font-semibold text-rose-400 hover:text-rose-300 flex items-center gap-1 transition-colors"
-                    >
-                      <span>Open on RareAnimes</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
+                    {watchResolution.url && (
+                      <a
+                        href={watchResolution.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-semibold text-rose-400 hover:text-rose-300 flex items-center gap-1 transition-colors"
+                      >
+                        <span>Open on RareAnimes</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
                   </div>
 
                   {/* Episodes Grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 pt-2">
                     {activeSeason.episodes && activeSeason.episodes.length > 0 ? (
-                      activeSeason.episodes.map(ep => (
-                        <a
-                          key={ep.episodeNumber}
-                          href={ep.canonicalUrl && ep.canonicalUrl.startsWith('https://www.rareanimes.mov') ? ep.canonicalUrl : watchResolution.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-2.5 rounded-lg bg-slate-800/90 dark:bg-slate-800/90 light:bg-white hover:bg-slate-700 dark:hover:bg-slate-700 light:hover:bg-slate-100 border border-slate-700/60 dark:border-slate-700/60 light:border-slate-300 flex items-center justify-between text-xs text-slate-200 dark:text-slate-200 light:text-slate-800 transition-colors group"
-                        >
-                          <span className="font-medium group-hover:text-rose-400 truncate">
-                            {ep.title}
-                          </span>
-                          <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-rose-400 shrink-0 ml-1" />
-                        </a>
-                      ))
+                      activeSeason.episodes.map(ep => {
+                        const epUrl =
+                          ep.canonicalUrl && ep.canonicalUrl.startsWith('https://www.rareanimes.mov')
+                            ? ep.canonicalUrl
+                            : watchResolution.url;
+                        return epUrl ? (
+                          <a
+                            key={ep.episodeNumber}
+                            href={epUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2.5 rounded-lg bg-slate-800/90 dark:bg-slate-800/90 light:bg-white hover:bg-slate-700 dark:hover:bg-slate-700 light:hover:bg-slate-100 border border-slate-700/60 dark:border-slate-700/60 light:border-slate-300 flex items-center justify-between text-xs text-slate-200 dark:text-slate-200 light:text-slate-800 transition-colors group"
+                          >
+                            <span className="font-medium group-hover:text-rose-400 truncate">
+                              {ep.title}
+                            </span>
+                            <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-rose-400 shrink-0 ml-1" />
+                          </a>
+                        ) : (
+                          <div
+                            key={ep.episodeNumber}
+                            className="p-2.5 rounded-lg bg-slate-800/60 text-slate-400 border border-slate-800 flex items-center justify-between text-xs"
+                          >
+                            <span className="truncate">{ep.title}</span>
+                          </div>
+                        );
+                      })
                     ) : (
                       <div className="col-span-full py-4 text-center text-xs text-slate-400">
                         Episodes: Not available for individual direct selection. Use “OPEN THIS ANIME TO WATCH” to browse all available episodes on RareAnimes.

@@ -30,6 +30,7 @@ import { AuthModal } from './components/AuthModal.tsx';
 import { AnimeArtwork } from './components/AnimeArtwork.tsx';
 import { CompareAnimeView } from './components/CompareAnimeView.tsx';
 import { AccountView } from './components/AccountView.tsx';
+import { AniVaultLogo } from './components/AniVaultLogo.tsx';
 import {
   RARETOON_BASE_URL,
   RARETOON_PROVIDER_NAME,
@@ -53,6 +54,7 @@ export function App() {
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'popular' | 'title' | 'year' | 'seasons'>('popular');
   const [selectedAnime, setSelectedAnime] = useState<Anime | null>(null);
+  const [isFromSurprise, setIsFromSurprise] = useState<boolean>(false);
 
   // Modals & Navigation
   const [isStatsOpen, setIsStatsOpen] = useState<boolean>(false);
@@ -60,8 +62,9 @@ export function App() {
   const [isAuthOpen, setIsAuthOpen] = useState<boolean>(false);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<NavTabType>('browse');
+  const [myListSubTab, setMyListSubTab] = useState<'favorites' | 'watchlist'>('favorites');
 
-  const [stats, setStats] = useState<CatalogueStats | null>(fallbackReport as CatalogueStats);
+  const [stats, setStats] = useState<CatalogueStats | null>((fallbackReport as unknown) as CatalogueStats);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const ITEMS_PER_PAGE = 24;
 
@@ -132,7 +135,10 @@ export function App() {
     let result = [...allAnime];
 
     // Filter by tab
-    if (activeTab === 'watchlist') {
+    if (activeTab === 'mylist') {
+      const targetIds = myListSubTab === 'favorites' ? userData.favorites : userData.watchlist;
+      result = result.filter(item => targetIds.includes(item.id));
+    } else if (activeTab === 'watchlist') {
       result = result.filter(item => userData.watchlist.includes(item.id));
     } else if (activeTab === 'favorites') {
       result = result.filter(item => userData.favorites.includes(item.id));
@@ -237,8 +243,24 @@ export function App() {
   }, [filteredAnime, currentPage]);
 
   const handleSelectAnime = (anime: Anime) => {
+    setIsFromSurprise(false);
     setSelectedAnime(anime);
     addToHistory(anime.id);
+  };
+
+  const handleSurpriseSelectAnime = (anime: Anime) => {
+    setIsFromSurprise(true);
+    setSelectedAnime(anime);
+    addToHistory(anime.id);
+  };
+
+  const handleSurpriseRollAgain = () => {
+    if (allAnime.length > 0) {
+      const randomIndex = Math.floor(Math.random() * allAnime.length);
+      const randomItem = allAnime[randomIndex];
+      setSelectedAnime(randomItem);
+      addToHistory(randomItem.id);
+    }
   };
 
   const handleTriggerSync = async () => {
@@ -271,18 +293,10 @@ export function App() {
     }
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Instant scroll jump to position 0 without visible scrolling animation
+  const jumpToTopInstant = () => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
-
-  // Featured anime for spotlight hero banner (Solo Leveling or first anime)
-  const featuredAnime = useMemo(() => {
-    return (
-      allAnime.find(a => a.id.includes('solo_leveling')) ||
-      allAnime.find(a => a.id.includes('frieren')) ||
-      allAnime[0]
-    );
-  }, [allAnime]);
 
   // Recently viewed history list
   const recentHistoryAnime = useMemo(() => {
@@ -360,81 +374,6 @@ export function App() {
               </div>
             </div>
 
-            {/* Featured Series Spotlight Banner (Matching Screenshot 2 - Solo Leveling) */}
-            {featuredAnime && (
-              <div
-                id="featured-spotlight-banner"
-                className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-950 dark:from-slate-900 dark:via-slate-900/90 dark:to-slate-950 light:from-white light:via-slate-50 light:to-white border border-slate-800/90 dark:border-slate-800/90 light:border-slate-200 p-5 md:p-6 shadow-xl"
-              >
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
-                  {/* Poster Thumbnail */}
-                  <div className="md:col-span-3 w-full max-w-[200px] mx-auto md:mx-0 aspect-[3/4] rounded-xl overflow-hidden shadow-2xl relative">
-                    <AnimeArtwork
-                      src={featuredAnime.artwork?.verifiedArtworkUrl}
-                      alt={featuredAnime.title}
-                      aspectRatio="aspect-[3/4]"
-                    />
-                    <div className="absolute top-2 left-2 z-10">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-950/90 text-amber-300 border border-amber-600/50">
-                        Spotlight
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Details */}
-                  <div className="md:col-span-9 space-y-3">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-600/20 text-rose-400 border border-rose-500/40">
-                        {featuredAnime.type} Series
-                      </span>
-                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                        {featuredAnime.seasons?.length || 1} Seasons • {featuredAnime.releaseYear} • {calculateTotalEpisodes(featuredAnime) || '12+'} Episodes
-                      </span>
-                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-950/80 text-emerald-300 border border-emerald-700/40">
-                        {featuredAnime.status}
-                      </span>
-                    </div>
-
-                    <h2 className="text-2xl md:text-3xl font-black text-white dark:text-white light:text-slate-900 tracking-tight">
-                      {featuredAnime.title}
-                    </h2>
-                    {featuredAnime.alternateTitle && (
-                      <p className="text-xs text-slate-400 italic">
-                        {featuredAnime.alternateTitle}
-                      </p>
-                    )}
-
-                    <p className="text-xs md:text-sm text-slate-300 dark:text-slate-300 light:text-slate-600 max-w-3xl line-clamp-3 leading-relaxed">
-                      {featuredAnime.synopsis}
-                    </p>
-
-                    <div className="flex flex-wrap items-center gap-2 pt-1">
-                      <button
-                        type="button"
-                        id="btn-spotlight-details"
-                        onClick={() => handleSelectAnime(featuredAnime)}
-                        className="py-2.5 px-5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white shadow-md shadow-rose-600/30 flex items-center gap-2 transition-all transform active:scale-95"
-                      >
-                        <Sparkles className="w-4 h-4" />
-                        <span>View Anime Details &amp; Seasons</span>
-                      </button>
-
-                      <a
-                        href={resolveWatchUrl(featuredAnime).url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        id="btn-spotlight-watch"
-                        className="py-2.5 px-4 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 light:bg-slate-100 light:hover:bg-slate-200 text-slate-200 dark:text-slate-200 light:text-slate-800 border border-slate-700 dark:border-slate-700 light:border-slate-300 flex items-center gap-1.5 transition-colors"
-                      >
-                        <span>Open to Watch on RareAnimes</span>
-                        <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* "Continue Exploring" / Recently Viewed Row */}
             {recentHistoryAnime.length > 0 && (
               <div className="space-y-2.5 p-4 rounded-2xl bg-slate-900/60 dark:bg-slate-900/60 light:bg-white border border-slate-800/80 dark:border-slate-800/80 light:border-slate-200">
@@ -482,35 +421,105 @@ export function App() {
           </div>
         )}
 
-        {/* Dedicated View Header for Watchlist, Favorites, or Watched Tabs */}
+        {/* Dedicated View Header for My List (Favorites & Watch Later) or Watched Tabs */}
         {activeTab !== 'browse' && activeTab !== 'compare' && activeTab !== 'account' && (
-          <div className="p-5 rounded-2xl bg-slate-900/80 dark:bg-slate-900/80 light:bg-white border border-slate-800 dark:border-slate-800 light:border-slate-200 space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                {activeTab === 'watchlist' && <Bookmark className="w-6 h-6 text-indigo-400 fill-indigo-400/20" />}
-                {activeTab === 'favorites' && <Heart className="w-6 h-6 text-rose-500 fill-rose-500/20" />}
-                {activeTab === 'completed' && <Check className="w-6 h-6 text-emerald-400" />}
-                <h1 className="text-xl font-bold text-white dark:text-white light:text-slate-900">
-                  {activeTab === 'watchlist' && 'My Watch Later List'}
-                  {activeTab === 'favorites' && 'My Favorite Anime'}
-                  {activeTab === 'completed' && 'Completed & Watched Anime'}
-                </h1>
-              </div>
+          <div className="p-5 sm:p-6 rounded-2xl bg-slate-900/80 dark:bg-slate-900/80 light:bg-white border border-slate-800 dark:border-slate-800 light:border-slate-200 space-y-4">
+            {activeTab === 'mylist' || activeTab === 'watchlist' || activeTab === 'favorites' ? (
+              <>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h1 className="text-xl sm:text-2xl font-black text-white dark:text-white light:text-slate-900 tracking-tight flex items-center gap-2.5">
+                      <Bookmark className="w-6 h-6 text-rose-500 fill-rose-500/20" />
+                      <span>My List</span>
+                    </h1>
+                    <p className="text-xs text-slate-400 dark:text-slate-400 light:text-slate-600 mt-1">
+                      Your personal anime library saved securely on your device and account.
+                    </p>
+                  </div>
 
-              <button
-                type="button"
-                id="btn-return-browse"
-                onClick={() => setActiveTab('browse')}
-                className="text-xs font-semibold text-rose-400 hover:underline"
-              >
-                ← Return to Full Catalogue
-              </button>
-            </div>
-            <p className="text-xs text-slate-400 dark:text-slate-400 light:text-slate-600">
-              {activeTab === 'watchlist' && 'Anime titles saved to watch later. Stored securely on your device & account.'}
-              {activeTab === 'favorites' && 'Your personal top favorites from the AniVault catalogue.'}
-              {activeTab === 'completed' && 'All series and movies you have marked as watched.'}
-            </p>
+                  <button
+                    type="button"
+                    id="btn-return-browse"
+                    onClick={() => setActiveTab('browse')}
+                    className="text-xs font-semibold text-rose-400 hover:text-rose-300 transition-colors self-start sm:self-auto"
+                  >
+                    ← Return to Browse
+                  </button>
+                </div>
+
+                {/* Clearly Separated Subsections / Tabs */}
+                <div className="flex items-center gap-2 p-1.5 bg-slate-950/80 dark:bg-slate-950/80 light:bg-slate-100 rounded-xl border border-slate-800/80 dark:border-slate-800/80 light:border-slate-300 max-w-md" id="mylist-subtabs-container">
+                  <button
+                    type="button"
+                    id="subtab-favorites"
+                    onClick={() => {
+                      setActiveTab('mylist');
+                      setMyListSubTab('favorites');
+                      setCurrentPage(1);
+                    }}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+                      (activeTab === 'mylist' && myListSubTab === 'favorites') || activeTab === 'favorites'
+                        ? 'bg-rose-600 text-white shadow-md shadow-rose-950/30'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-900 dark:hover:bg-slate-900 light:hover:bg-slate-200'
+                    }`}
+                  >
+                    <Heart className={`w-4 h-4 ${(activeTab === 'mylist' && myListSubTab === 'favorites') || activeTab === 'favorites' ? 'fill-white' : 'text-rose-400'}`} />
+                    <span>❤️ Favorites</span>
+                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                      (activeTab === 'mylist' && myListSubTab === 'favorites') || activeTab === 'favorites' ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-300'
+                    }`}>
+                      {userData.favorites.length}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    id="subtab-watchlist"
+                    onClick={() => {
+                      setActiveTab('mylist');
+                      setMyListSubTab('watchlist');
+                      setCurrentPage(1);
+                    }}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+                      (activeTab === 'mylist' && myListSubTab === 'watchlist') || activeTab === 'watchlist'
+                        ? 'bg-rose-600 text-white shadow-md shadow-rose-950/30'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-900 dark:hover:bg-slate-900 light:hover:bg-slate-200'
+                    }`}
+                  >
+                    <Bookmark className={`w-4 h-4 ${(activeTab === 'mylist' && myListSubTab === 'watchlist') || activeTab === 'watchlist' ? 'fill-white' : 'text-indigo-400'}`} />
+                    <span>🔖 Watch Later</span>
+                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                      (activeTab === 'mylist' && myListSubTab === 'watchlist') || activeTab === 'watchlist' ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-300'
+                    }`}>
+                      {userData.watchlist.length}
+                    </span>
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <Check className="w-6 h-6 text-emerald-400" />
+                  <div>
+                    <h1 className="text-xl font-bold text-white dark:text-white light:text-slate-900">
+                      Completed &amp; Watched Anime
+                    </h1>
+                    <p className="text-xs text-slate-400 dark:text-slate-400 light:text-slate-600 mt-0.5">
+                      All series and movies you have marked as completed.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  id="btn-return-browse-completed"
+                  onClick={() => setActiveTab('browse')}
+                  className="text-xs font-semibold text-rose-400 hover:underline"
+                >
+                  ← Return to Browse
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -608,13 +617,21 @@ export function App() {
                   <Search className="w-6 h-6" />
                 </div>
                 <h3 className="text-base font-bold text-white dark:text-white light:text-slate-900">
-                  {activeTab !== 'browse'
-                    ? `No items in ${activeTab === 'watchlist' ? 'Watch Later' : activeTab === 'favorites' ? 'Favorites' : 'Watched'}`
+                  {activeTab === 'mylist'
+                    ? `No items in ${myListSubTab === 'favorites' ? 'Favorites' : 'Watch Later'}`
+                    : activeTab === 'watchlist'
+                    ? 'No items in Watch Later'
+                    : activeTab === 'favorites'
+                    ? 'No items in Favorites'
+                    : activeTab === 'completed'
+                    ? 'No Watched Anime'
                     : 'No Anime Found'}
                 </h3>
                 <p className="text-xs text-slate-400 dark:text-slate-400 light:text-slate-600 max-w-sm mx-auto">
-                  {activeTab !== 'browse'
-                    ? 'Use the bookmark, heart, and checkmark buttons on anime cards to curate your personal collection.'
+                  {activeTab === 'mylist'
+                    ? `Add anime to your ${myListSubTab === 'favorites' ? 'Favorites' : 'Watch Later'} using the ${myListSubTab === 'favorites' ? 'heart' : 'bookmark'} button on any anime card.`
+                    : activeTab === 'completed'
+                    ? 'Use the checkmark button on anime cards to mark series as completed.'
                     : `No anime matches your filter criteria "${searchQuery || selectedGenre}". Try searching another title or resetting your filters.`}
                 </p>
                 <button
@@ -657,9 +674,9 @@ export function App() {
                   disabled={currentPage <= 1}
                   onClick={() => {
                     setCurrentPage(p => Math.max(1, p - 1));
-                    scrollToTop();
+                    jumpToTopInstant();
                   }}
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-900 dark:bg-slate-900 light:bg-white hover:bg-slate-800 dark:hover:bg-slate-800 light:hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed border border-slate-800 dark:border-slate-800 light:border-slate-300 text-slate-200 dark:text-slate-200 light:text-slate-800 transition-colors"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-900 dark:bg-slate-900 light:bg-white hover:bg-slate-800 dark:hover:bg-slate-800 light:hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed border border-slate-800 dark:border-slate-800 light:border-slate-300 text-slate-200 dark:text-slate-200 light:text-slate-800 transition-colors cursor-pointer"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   <span>Previous</span>
@@ -676,9 +693,9 @@ export function App() {
                   disabled={currentPage >= totalPages}
                   onClick={() => {
                     setCurrentPage(p => Math.min(totalPages, p + 1));
-                    scrollToTop();
+                    jumpToTopInstant();
                   }}
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-900 dark:bg-slate-900 light:bg-white hover:bg-slate-800 dark:hover:bg-slate-800 light:hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed border border-slate-800 dark:border-slate-800 light:border-slate-300 text-slate-200 dark:text-slate-200 light:text-slate-800 transition-colors"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-900 dark:bg-slate-900 light:bg-white hover:bg-slate-800 dark:hover:bg-slate-800 light:hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed border border-slate-800 dark:border-slate-800 light:border-slate-300 text-slate-200 dark:text-slate-200 light:text-slate-800 transition-colors cursor-pointer"
                 >
                   <span>Next</span>
                   <ChevronRight className="w-4 h-4" />
@@ -733,8 +750,11 @@ export function App() {
       {selectedAnime && (
         <AnimeDetailsModal
           anime={selectedAnime}
-          onClose={() => setSelectedAnime(null)}
-          onRollAgain={() => setIsSurpriseOpen(true)}
+          onClose={() => {
+            setSelectedAnime(null);
+            setIsFromSurprise(false);
+          }}
+          onRollAgain={isFromSurprise ? handleSurpriseRollAgain : undefined}
         />
       )}
 
@@ -756,7 +776,7 @@ export function App() {
           isOpen={isSurpriseOpen}
           onClose={() => setIsSurpriseOpen(false)}
           catalogue={allAnime}
-          onSelectAnime={handleSelectAnime}
+          onSelectAnime={handleSurpriseSelectAnime}
         />
       )}
 

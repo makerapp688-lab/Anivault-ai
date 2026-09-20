@@ -13,7 +13,13 @@ import {
   Film,
   Tv,
   CheckCircle2,
-  Clock
+  Clock,
+  Skull,
+  Brain,
+  Search,
+  Coffee,
+  Moon,
+  GraduationCap
 } from 'lucide-react';
 
 interface CategoryFilterProps {
@@ -37,7 +43,16 @@ const GENRE_ICON_MAP: Record<string, React.ReactNode> = {
   Fantasy: <Sparkles className="w-4 h-4 text-purple-400" />,
   Isekai: <Layers className="w-4 h-4 text-rose-400" />,
   Drama: <Heart className="w-4 h-4 text-pink-400" />,
-  Sports: <Award className="w-4 h-4 text-blue-400" />
+  Sports: <Award className="w-4 h-4 text-blue-400" />,
+  Romance: <Heart className="w-4 h-4 text-rose-400" />,
+  Horror: <Skull className="w-4 h-4 text-red-400" />,
+  Psychological: <Brain className="w-4 h-4 text-violet-400" />,
+  Mystery: <Search className="w-4 h-4 text-yellow-400" />,
+  Supernatural: <Moon className="w-4 h-4 text-indigo-400" />,
+  'Slice of Life': <Coffee className="w-4 h-4 text-emerald-400" />,
+  School: <GraduationCap className="w-4 h-4 text-blue-400" />,
+  Historical: <Shield className="w-4 h-4 text-amber-500" />,
+  Thriller: <Skull className="w-4 h-4 text-rose-400" />
 };
 
 export const CategoryFilter: React.FC<CategoryFilterProps> = ({

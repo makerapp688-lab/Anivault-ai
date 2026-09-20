@@ -1,0 +1,13 @@
+{
+  "anivault_rt_pokemon": {
+    "verifiedArtworkUrl": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b527-t6dBVJ5OVcXK.png",
+    "isVerified": true,
+    "verificationSource": "ANILIST_GRAPHQL_OFFICIAL_CDN",
+    "aspectRatio": "3/4",
+    "animeId": "anivault_rt_pokemon",
+    "anilistId": 527,
+    "malId": 527,
+    "artworkStatus": "verified",
+    "artworkLastVerified": "2026-09-20T15:50:02.089Z"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "importStatus": "running",
+  "pagesScanned": 17,
+  "totalDiscovered": 173,
+  "stagedCount": 173,
+  "processedCount": 0,
+  "addedCount": 0,
+  "updatedCount": 0,
+  "duplicatesSkipped": 0,
+  "moviesCount": 0,
+  "rejectedCount": 0,
+  "failedCount": 0,
+  "verificationPendingCount": 173,
+  "finalCatalogueCount": 401,
+  "lastImportTime": "2026-09-20T15:45:15.172Z"
+}

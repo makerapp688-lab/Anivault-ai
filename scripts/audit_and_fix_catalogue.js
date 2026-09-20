@@ -8,7 +8,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2019,
     alternateTitle: 'Vinland Saga',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1500/103005.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101348-2fhDFPCuMNiz.jpg',
     seasonEpisodes: { 1: 24, 2: 24 }
   },
 
@@ -18,7 +18,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2013,
     alternateTitle: 'Shingeki no Kyojin',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/10/47347.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx16498-buvcRTBx4NSm.jpg',
     seasonEpisodes: { 1: 25, 2: 12, 3: 22, 4: 28 }
   },
 
@@ -28,7 +28,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2006,
     alternateTitle: 'Death Note',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/9/9453.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1535-kUgkcrfOrkUM.jpg',
     seasonEpisodes: { 1: 37 }
   },
 
@@ -38,7 +38,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2015,
     alternateTitle: 'Ansatsu Kyoushitsu',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/5/75810.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20755-dWrhs569YGUO.jpg',
     seasonEpisodes: { 1: 22, 2: 25 }
   },
 
@@ -48,7 +48,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2020,
     alternateTitle: 'Jujutsu Kaisen',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1171/109222.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx113415-LHBAeoZDIsnF.jpg',
     seasonEpisodes: { 1: 24, 2: 23 }
   },
 
@@ -58,7 +58,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2019,
     alternateTitle: 'Kimetsu no Yaiba',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1286/99889.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101922-WBsBl0ClmgYL.jpg',
     seasonEpisodes: { 1: 26, 2: 18, 3: 11, 4: 8 }
   },
 
@@ -68,7 +68,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2024,
     alternateTitle: 'Na Honjaman Rebeleop',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1844/141757.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx151807-it355ZgzquUd.png',
     seasonEpisodes: { 1: 12, 2: 13 }
   },
 
@@ -78,7 +78,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2023,
     alternateTitle: 'Sousou no Frieren',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1015/138075.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx154587-qQTzQnEJJ3oB.jpg',
     seasonEpisodes: { 1: 28 }
   },
 
@@ -88,7 +88,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2024,
     alternateTitle: 'Dandadan',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1966/143577.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx171018-60q1B6GK2Ghb.jpg',
     seasonEpisodes: { 1: 12 }
   },
 
@@ -98,7 +98,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2024,
     alternateTitle: 'Kaijuu 8-gou',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1758/141285.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx153288-25FBfFJzEQ5O.jpg',
     seasonEpisodes: { 1: 12 }
   },
 
@@ -108,7 +108,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2019,
     alternateTitle: 'Dr. STONE',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1613/102576.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx105333-GybuoSoOZfpH.jpg',
     seasonEpisodes: { 1: 24, 2: 11, 3: 22, 4: 12 }
   },
 
@@ -118,7 +118,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2016,
     alternateTitle: 'Boku no Hero Academia',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/10/78745.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21459-nYh85uj2Fuwr.jpg',
     seasonEpisodes: { 1: 13, 2: 25, 3: 25, 4: 25, 5: 25, 6: 25, 7: 21 }
   },
 
@@ -128,7 +128,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2017,
     alternateTitle: 'Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/4/86835.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx98659-WNyPLIZDpGGY.jpg',
     seasonEpisodes: { 1: 12, 2: 13, 3: 13 }
   },
 
@@ -138,7 +138,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2021,
     alternateTitle: 'Tokyo Revengers',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1830/117906.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx120120-cWDmnmeEntSe.jpg',
     seasonEpisodes: { 1: 24, 2: 13, 3: 13 }
   },
 
@@ -148,7 +148,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2018,
     alternateTitle: 'Baki (2018)',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1169/93126.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx97888-tdZ1r7qN1DRs.jpg',
     seasonEpisodes: { 1: 26 }
   },
 
@@ -158,7 +158,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2021,
     alternateTitle: 'Hanma Baki: Son of Ogre',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1370/118332.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx124195-5Z1JSrRlbMRe.jpg',
     seasonEpisodes: { 1: 12, 2: 27 }
   },
 
@@ -168,7 +168,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2014,
     alternateTitle: 'Haikyuu!!',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/7/76014.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20464-ooZUyBe4ptp9.png',
     seasonEpisodes: { 1: 25, 2: 25, 3: 10, 4: 25 }
   },
 
@@ -178,7 +178,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2017,
     alternateTitle: 'Black Clover',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/2/88336.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx97940-fyh8o7gNbha0.png',
     seasonEpisodes: { 1: 51, 2: 51, 3: 52, 4: 16 }
   },
 
@@ -188,7 +188,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2006,
     alternateTitle: 'Gintama',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/10/73249.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx918-iOaeBVUn4uK7.jpg',
     seasonEpisodes: { 1: 201 }
   },
 
@@ -198,7 +198,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2021,
     alternateTitle: 'Horimiya',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1695/111486.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx124080-3i22mRVPBS0T.jpg',
     seasonEpisodes: { 1: 13, 2: 13 }
   },
 
@@ -208,7 +208,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2022,
     alternateTitle: 'Bleach: Sennen Kessen-hen',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1764/126627.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx116674-p3zK4PUX2Aag.jpg',
     seasonEpisodes: { 1: 13, 2: 13, 3: 13 }
   },
 
@@ -218,7 +218,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2012,
     alternateTitle: 'High School DxD',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/11/35921.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/nx11617-nmxMU9Zh3H5R.jpg',
     seasonEpisodes: { 1: 12 }
   },
 
@@ -228,7 +228,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2020,
     alternateTitle: 'Xian Wang de Richang Shenghuo',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1614/105436.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx114121-vxWVgIBlBjox.png',
     seasonEpisodes: { 1: 15, 2: 12, 3: 12, 4: 12 }
   },
 
@@ -238,7 +238,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2021,
     alternateTitle: 'Mushoku Tensei: Isekai Ittara Honki Dasu',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1530/117776.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx108465-1ANspF1EWyFx.jpg',
     seasonEpisodes: { 1: 23, 2: 24 }
   },
 
@@ -248,7 +248,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2018,
     alternateTitle: 'Tensei shitara Slime Datta Ken',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1092/95535.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx101280-tDxCVJm714nt.jpg',
     seasonEpisodes: { 1: 24, 2: 24, 3: 24 }
   },
 
@@ -258,7 +258,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2022,
     alternateTitle: 'Blue Lock',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1258/126929.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx137822-U8naszP96vzC.png',
     seasonEpisodes: { 1: 24, 2: 14 }
   },
 
@@ -268,7 +268,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2016,
     alternateTitle: 'Re:Zero kara Hajimeru Isekai Seikatsu',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1522/128039.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21355-wRVUrGxpvIQQ.jpg',
     seasonEpisodes: { 1: 25, 2: 25, 3: 16 }
   },
 
@@ -278,7 +278,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2024,
     alternateTitle: 'Tsue to Tsurugi no Wistoria',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1260/143522.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx174576-tpKcHG0eO6CS.jpg',
     seasonEpisodes: { 1: 12 }
   },
 
@@ -288,6 +288,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2025,
     alternateTitle: 'Sakamoto Days',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx177709-e5Qx6RlsBgD5.png',
     seasonEpisodes: { 1: 12 }
   },
 
@@ -297,6 +298,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2025,
     alternateTitle: 'Zenshu.',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx176273-raxxcgkslf4Q.jpg',
     seasonEpisodes: { 1: 12 }
   },
 
@@ -306,7 +308,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2007,
     alternateTitle: 'Devil May Cry',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/13/20040.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1726-IrpH32PVADiO.jpg',
     seasonEpisodes: { 1: 12 }
   },
 
@@ -316,7 +318,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2002,
     alternateTitle: 'Naruto',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/13/17405.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx20-dE6UHbFFg1A5.jpg',
     seasonEpisodes: { 1: 35, 2: 48, 3: 48, 4: 26, 5: 28, 6: 26, 7: 26, 8: 26, 9: 7 }
   },
 
@@ -326,7 +328,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2007,
     alternateTitle: 'Naruto: Shippuuden',
-    artworkUrl: 'https://cdn.myanimelist.net/images/anime/1565/111305.jpg',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1735-kGfVm0YqCPcu.png',
     seasonEpisodes: {
       1: 32, 2: 21, 3: 18, 4: 17, 5: 24, 6: 31, 7: 8, 8: 24,
       9: 21, 10: 25, 11: 21, 12: 33, 13: 20, 14: 25, 15: 28, 16: 212
@@ -339,6 +341,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2005,
     alternateTitle: 'Doraemon (2005)',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/501.jpg',
     seasonEpisodes: { 1: 52, 2: 52, 3: 52, 4: 52, 5: 52, 6: 52, 7: 52, 8: 52, 14: 52 }
   },
 
@@ -348,6 +351,7 @@ const verifiedRegistry = {
     type: 'TV',
     releaseYear: 2016,
     alternateTitle: 'Pokemon Sun & Moon',
+    artworkUrl: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21507-4z4gJkZ3N3v0.png',
     seasonEpisodes: { 1: 82, 20: 43 }
   },
 
@@ -381,7 +385,7 @@ const verifiedRegistry = {
     status: 'Upcoming',
     type: 'TV',
     releaseYear: 2026,
-    seasonEpisodes: { 1: 12 }
+    seasonEpisodes: { 1: null }
   },
 
   // 40. Release That Witch
@@ -389,7 +393,7 @@ const verifiedRegistry = {
     status: 'Upcoming',
     type: 'TV',
     releaseYear: 2025,
-    seasonEpisodes: { 1: 12 }
+    seasonEpisodes: { 1: null }
   },
 
   // 41. Hoppers (2026 Movie)
@@ -398,11 +402,38 @@ const verifiedRegistry = {
     type: 'Movie',
     releaseYear: 2026,
     seasonEpisodes: { 1: 1 }
+  },
+
+  // 42. Shin Chan In Very Very Tasty Tasty (Movie)
+  'anivault_rt_shin_chan_in_very_very_tasty_tasty': {
+    status: 'Completed',
+    type: 'Movie',
+    releaseYear: 2013,
+    alternateTitle: 'Crayon Shin-chan: Very Tasty Tasty B-grade Gourmet Survival!!',
+    seasonEpisodes: { 1: 1 }
+  },
+
+  // 43. Doraemon All Seasons
+  'anivault_rt_doraemon_all_seasons_episodes': {
+    status: 'Completed',
+    type: 'TV',
+    releaseYear: 2005,
+    alternateTitle: 'Doraemon Classic All Seasons',
+    seasonEpisodes: { 1: 52 }
   }
 };
 
 const inputPath = path.join(process.cwd(), 'server', 'data', 'anivault-catalogue.json');
-const catalogue = JSON.parse(fs.readFileSync(inputPath, 'utf-8'));
+let rawCatalogue = JSON.parse(fs.readFileSync(inputPath, 'utf-8'));
+
+// Filter out spurious category hub/archive pages that crawled in with SVG logo
+const EXCLUDED_HUB_IDS = new Set([
+  'anivault_rt_animes',
+  'anivault_rt_disney',
+  'anivault_rt_movies',
+  'anivault_rt_doraemon'
+]);
+const catalogue = rawCatalogue.filter(a => !EXCLUDED_HUB_IDS.has(a.id));
 
 let statusesCorrectedCount = 0;
 let episodeCountsCorrectedCount = 0;
@@ -517,12 +548,17 @@ for (const anime of catalogue) {
 
   // Ensure total episodes separated from season episodes
   let totalEp = 0;
+  let hasNull = false;
   if (Array.isArray(anime.seasons)) {
     for (const s of anime.seasons) {
-      totalEp += (s.episodeCount || 1);
+      if (s.episodeCount === null || s.episodeCount === undefined) {
+        hasNull = true;
+      } else {
+        totalEp += s.episodeCount;
+      }
     }
   }
-  anime.totalEpisodes = totalEp;
+  anime.totalEpisodes = hasNull && totalEp === 0 ? null : (totalEp > 0 ? totalEp : null);
   anime.totalSeasons = anime.seasons ? anime.seasons.length : 1;
 
   // Clean up any old provider links to the new active RareToon domain

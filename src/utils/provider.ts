@@ -35,21 +35,23 @@ export function isVerifiedNewRareToonUrl(url?: string): boolean {
 /**
  * Resolves the watch destination URL for an anime or selected season.
  * Guarantees that:
- * 1. If an exact verified deep link on rareanimes.mov exists, it is returned with isExact = true.
- * 2. If no verified deep link exists, it safely falls back to RARETOON_BASE_URL with isExact = false.
- * 3. Never returns an old raretoonindia.in link or a fabricated URL.
+ * 1. If an exact verified deep link on rareanimes.mov exists, it is returned with isAvailable = true and isExact = true.
+ * 2. If the exact title cannot be verified on RareAnimes, returns isAvailable = false, url = null, and label = 'Not available'.
+ * 3. Never returns an old raretoonindia.in link or a fabricated/guessed URL.
  */
 export function resolveWatchUrl(anime: Anime, selectedSeasonNumber?: number): {
-  url: string;
+  url: string | null;
+  isAvailable: boolean;
   isExact: boolean;
   label: string;
 } {
   // 1. If a season is selected, check that season's canonicalUrl
   if (selectedSeasonNumber) {
     const season = anime.seasons?.find(s => s.seasonNumber === selectedSeasonNumber);
-    if (season?.canonicalUrl && isVerifiedNewRareToonUrl(season.canonicalUrl)) {
+    if (season?.canonicalUrl && isVerifiedNewRareToonUrl(season.canonicalUrl) && !season.canonicalUrl.includes('/home/')) {
       return {
         url: season.canonicalUrl,
+        isAvailable: true,
         isExact: true,
         label: `${season.title || `Season ${season.seasonNumber}`} on RareAnimes`
       };
@@ -58,9 +60,10 @@ export function resolveWatchUrl(anime: Anime, selectedSeasonNumber?: number): {
 
   // 2. Check the anime's primary provider canonical URL
   const primaryUrl = anime.providers?.raretoonIndia?.canonicalUrl;
-  if (primaryUrl && isVerifiedNewRareToonUrl(primaryUrl)) {
+  if (primaryUrl && isVerifiedNewRareToonUrl(primaryUrl) && !primaryUrl.includes('/home/')) {
     return {
       url: primaryUrl,
+      isAvailable: true,
       isExact: true,
       label: `${anime.title} on RareAnimes`
     };
@@ -70,16 +73,18 @@ export function resolveWatchUrl(anime: Anime, selectedSeasonNumber?: number): {
   if (KNOWN_RAREANIMES_EXACT_MAP[anime.id]) {
     return {
       url: KNOWN_RAREANIMES_EXACT_MAP[anime.id],
+      isAvailable: true,
       isExact: true,
       label: `${anime.title} on RareAnimes`
     };
   }
 
-  // 4. Honest fallback to the new RareToon homepage
+  // 4. Strict "Not available" when exact title cannot be verified
   return {
-    url: RARETOON_BASE_URL,
+    url: null,
+    isAvailable: false,
     isExact: false,
-    label: `RareAnimes Catalogue Homepage`
+    label: 'Not available on RareAnimes'
   };
 }
 

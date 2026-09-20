@@ -129,7 +129,7 @@ export const AnimeCard: React.FC<AnimeCardProps> = ({ anime, onSelect }) => {
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-950/85 backdrop-blur-md text-white border border-slate-700/60">
             <Tv className="w-3 h-3 text-rose-400" />
             <span>
-              {totalEpisodes !== null ? `${totalEpisodes} Eps` : 'Eps: N/A'}
+              {totalEpisodes !== null ? `${totalEpisodes} Eps` : 'Not available'}
             </span>
           </span>
         </div>
