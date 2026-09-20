@@ -2,16 +2,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 /**
- * ANIVAULT — PERMANENT AUTOMATIC ARTWORK MANAGER & RESOLUTION PIPELINE
+ * ANIVAULT — PERMANENT AUTOMATIC ARTWORK MANAGER & VALIDATION PIPELINE
  * 
- * Hierarchy:
- * 1. RareToon thumbnail (when legitimately available & valid image)
- * 2. AniList GraphQL API (exact AniList ID -> coverImage.extraLarge / large)
- * 3. MAL / Jikan API (exact MAL ID -> images.jpg.large_image_url)
- * 4. AniVault Placeholder (artworkStatus = 'unavailable')
- * 
- * Stores 1-to-1 binding:
- * AniVault Media ID <-> AniList ID <-> MAL ID <-> Provider ID <-> Artwork URL
+ * Rules:
+ * 1. An artwork URL is ONLY verified if the actual image can be successfully retrieved (HTTP 200 + image Content-Type).
+ * 2. Never trust `isVerified = true` by itself. Dead/invalid URLs must be repaired.
+ * 3. Store exact URLs returned by AniList or MAL metadata APIs — never construct, guess, or invent CDN URLs.
+ * 4. Exact AniList ID lookup -> Exact MAL ID lookup -> Title search last resort.
+ * 5. Invalid cached URLs are purged from cache and re-resolved.
+ * 6. Placeholders use `isVerified = false` and `artworkStatus = 'pending'`.
  */
 
 const PROD_FILE = path.join(process.cwd(), 'server', 'data', 'anivault-catalogue.json');
@@ -26,6 +25,8 @@ const DEFAULT_PLACEHOLDER = 'https://images.unsplash.com/photo-1578632767115-351
 
 let isCurrentlyRepairing = false;
 
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 function cleanTitleForSearch(title) {
   if (!title) return '';
   return title
@@ -39,8 +40,57 @@ function cleanTitleForSearch(title) {
     .trim();
 }
 
-// 1. ANILIST GRAPHQL LOOKUP
-async function fetchAniListArtwork(title, malId, aniListId) {
+/**
+ * IMAGE URL HEALTH CHECK FUNCTION
+ * Determines whether a URL is reachable and returns a valid image.
+ */
+export async function validateArtworkUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) return false;
+  if (trimmed.includes('unsplash.com')) return false; // Unsplash is placeholder, not verified artwork
+
+  try {
+    // 1. HEAD request for fast HTTP check
+    const headRes = await fetch(trimmed, {
+      method: 'HEAD',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
+      },
+      signal: AbortSignal.timeout(3500)
+    });
+
+    if (headRes.ok) {
+      const type = headRes.headers.get('content-type') || '';
+      if (type.includes('image') || type.includes('octet-stream')) {
+        return true;
+      }
+    }
+
+    // 2. GET request fallback if HEAD returns 405/403 or non-standard headers
+    const getRes = await fetch(trimmed, {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
+      },
+      signal: AbortSignal.timeout(4000)
+    });
+
+    if (getRes.ok) {
+      const type = getRes.headers.get('content-type') || '';
+      return type.includes('image') || type.includes('octet-stream');
+    }
+
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+// 1. ANILIST GRAPHQL LOOKUP WITH RATE LIMIT HANDLING & RETRY
+async function fetchAniListArtwork(aniListId, malId, title) {
   const query = `
     query ($id: Int, $idMal: Int, $search: String) {
       Media (id: $id, idMal: $idMal, search: $search, type: ANIME) {
@@ -63,44 +113,66 @@ async function fetchAniListArtwork(title, malId, aniListId) {
   const variables = {};
   if (aniListId) variables.id = Number(aniListId);
   else if (malId) variables.idMal = Number(malId);
-  else variables.search = cleanTitleForSearch(title);
+  else if (title) variables.search = cleanTitleForSearch(title);
+  else return null;
 
-  try {
-    const res = await fetch('https://graphql.anilist.co', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ query, variables }),
-      signal: AbortSignal.timeout(5000)
-    });
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const res = await fetch('https://graphql.anilist.co', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'User-Agent': 'AniVaultApp/1.0'
+        },
+        body: JSON.stringify({ query, variables }),
+        signal: AbortSignal.timeout(6000)
+      });
 
-    if (!res.ok) return null;
-    const json = await res.json();
-    if (json.data && json.data.Media) {
-      const media = json.data.Media;
-      const cover = media.coverImage?.extraLarge || media.coverImage?.large;
-      if (cover) {
-        return {
-          verifiedArtworkUrl: cover,
-          aniListId: media.id,
-          malId: media.idMal,
-          source: 'ANILIST_GRAPHQL_OFFICIAL_CDN'
-        };
+      if (res.status === 429) {
+        await sleep(1000 * (attempt + 1));
+        continue;
       }
+
+      if (!res.ok) return null;
+
+      const json = await res.json();
+      if (json.data && json.data.Media) {
+        const media = json.data.Media;
+        const cover = media.coverImage?.extraLarge || media.coverImage?.large || media.coverImage?.medium;
+        if (cover) {
+          return {
+            verifiedArtworkUrl: cover,
+            aniListId: media.id,
+            malId: media.idMal,
+            source: 'ANILIST_GRAPHQL_OFFICIAL_CDN'
+          };
+        }
+      }
+      return null;
+    } catch {
+      await sleep(500);
     }
-    return null;
-  } catch {
-    return null;
   }
+  return null;
 }
 
 // 2. MAL / JIKAN LOOKUP
 async function fetchMalArtwork(malId, title) {
   try {
-    const url = malId
-      ? `https://api.jikan.moe/v4/anime/${malId}`
-      : `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(cleanTitleForSearch(title))}&limit=1`;
+    let url = null;
+    if (malId) {
+      url = `https://api.jikan.moe/v4/anime/${malId}`;
+    } else if (title) {
+      url = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(cleanTitleForSearch(title))}&limit=1`;
+    } else {
+      return null;
+    }
 
-    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'AniVaultApp/1.0' },
+      signal: AbortSignal.timeout(5000)
+    });
     if (!res.ok) return null;
     const json = await res.json();
     const anime = Array.isArray(json.data) ? json.data[0] : json.data;
@@ -118,7 +190,39 @@ async function fetchMalArtwork(malId, title) {
   }
 }
 
-// Helper: load & save cache
+// 3. KITSU FALLBACK LOOKUP
+async function fetchKitsuArtwork(title) {
+  if (!title) return null;
+  const clean = cleanTitleForSearch(title);
+  if (!clean) return null;
+
+  try {
+    const url = `https://kitsu.io/api/edge/anime?filter[text]=${encodeURIComponent(clean)}&page[limit]=1`;
+    const res = await fetch(url, {
+      headers: {
+        'Accept': 'application/vnd.api+json',
+        'User-Agent': 'AniVaultApp/1.0'
+      },
+      signal: AbortSignal.timeout(5000)
+    });
+
+    if (!res.ok) return null;
+    const json = await res.json();
+    const poster = json.data?.[0]?.attributes?.posterImage?.large || json.data?.[0]?.attributes?.posterImage?.original || json.data?.[0]?.attributes?.posterImage?.medium;
+
+    if (poster) {
+      return {
+        verifiedArtworkUrl: poster,
+        source: 'KITSU_OFFICIAL_CDN'
+      };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+// Helpers for cache & queue
 function getCache() {
   if (fs.existsSync(ARTWORK_CACHE_FILE)) {
     try { return JSON.parse(fs.readFileSync(ARTWORK_CACHE_FILE, 'utf-8')); } catch {}
@@ -131,7 +235,6 @@ function saveCache(cache) {
   fs.writeFileSync(ARTWORK_CACHE_FILE, JSON.stringify(cache, null, 2));
 }
 
-// Helper: load & save retry queue
 function getRetryQueue() {
   if (fs.existsSync(RETRY_QUEUE_FILE)) {
     try { return JSON.parse(fs.readFileSync(RETRY_QUEUE_FILE, 'utf-8')); } catch {}
@@ -144,7 +247,6 @@ function saveRetryQueue(queue) {
   fs.writeFileSync(RETRY_QUEUE_FILE, JSON.stringify(queue, null, 2));
 }
 
-// Helper: load current catalogue
 function loadMasterCatalogue() {
   let catalogue = [];
   const candidatePaths = [PROD_FILE, SEED_FILE, CLIENT_PROD_FILE];
@@ -173,114 +275,226 @@ function saveMasterCatalogue(catalogue) {
 }
 
 /**
- * Single Item Artwork Resolution Function
+ * CORE ITEM ARTWORK RESOLUTION & VALIDATION ENGINE
  */
-export async function resolveItemArtwork(item) {
+export async function resolveItemArtwork(item, forceRefresh = false) {
   if (!item || !item.id) return item;
 
   const cache = getCache();
   const cacheKey = item.id;
 
-  // 1. Check cache first
-  if (cache[cacheKey] && cache[cacheKey].isVerified) {
-    item.artwork = cache[cacheKey];
-    if (cache[cacheKey].anilistId) item.aniListId = cache[cacheKey].anilistId;
-    if (cache[cacheKey].malId) item.malId = cache[cacheKey].malId;
-    return item;
+  // 1. Check cache first IF not forceRefresh
+  if (!forceRefresh && cache[cacheKey]) {
+    const cachedArt = cache[cacheKey];
+    const cachedUrl = typeof cachedArt === 'string' ? cachedArt : cachedArt?.verifiedArtworkUrl || cachedArt?.artworkUrl;
+
+    if (cachedArt.isVerified && cachedUrl) {
+      // Validate cached URL — DO NOT TRUST BLINDLY!
+      const isValidCached = await validateArtworkUrl(cachedUrl);
+      if (isValidCached) {
+        item.artwork = {
+          mediaId: item.id,
+          animeId: item.id,
+          anilistId: cachedArt.anilistId || item.aniListId || null,
+          malId: cachedArt.malId || item.malId || null,
+          verifiedArtworkUrl: cachedUrl,
+          artworkUrl: cachedUrl,
+          isVerified: true,
+          verificationSource: cachedArt.verificationSource || 'OFFICIAL_CDN_CACHE',
+          aspectRatio: '3/4',
+          artworkStatus: 'verified',
+          lastVerified: new Date().toISOString()
+        };
+        if (cachedArt.anilistId) item.aniListId = cachedArt.anilistId;
+        if (cachedArt.malId) item.malId = cachedArt.malId;
+        return item;
+      } else {
+        // Cache contains dead URL -> Delete entry and re-resolve fresh!
+        delete cache[cacheKey];
+        saveCache(cache);
+      }
+    }
   }
 
-  // 2. Check if item already has legitimate verified non-placeholder artwork
-  const currentUrl = typeof item.artwork === 'string' ? item.artwork : item.artwork?.verifiedArtworkUrl;
-  const isUnsplash = currentUrl && currentUrl.includes('unsplash.com');
-  const isPlaceholder = !currentUrl || isUnsplash || item.artwork?.isVerified === false;
-
-  if (!isPlaceholder && currentUrl) {
-    const verifiedArt = {
-      mediaId: item.id,
-      animeId: item.id,
-      anilistId: item.aniListId || null,
-      malId: item.malId || null,
-      providerId: item.providerId || item.providerAnimeId || null,
-      artworkUrl: currentUrl,
-      verifiedArtworkUrl: currentUrl,
-      isVerified: true,
-      artworkSource: item.artwork?.verificationSource || 'RARETOON_CANONICAL_POST_THUMBNAIL',
-      verificationSource: item.artwork?.verificationSource || 'RARETOON_CANONICAL_POST_THUMBNAIL',
-      aspectRatio: '3/4',
-      artworkStatus: 'verified',
-      lastVerified: new Date().toISOString(),
-      retryCount: 0
-    };
-
-    cache[cacheKey] = verifiedArt;
-    saveCache(cache);
-    item.artwork = verifiedArt;
-    return item;
+  // 2. Check item's current artwork property
+  const currentUrl = typeof item.artwork === 'string' ? item.artwork : item.artwork?.verifiedArtworkUrl || item.artwork?.artworkUrl;
+  if (!forceRefresh && item.artwork?.isVerified && currentUrl) {
+    const isValidCurrent = await validateArtworkUrl(currentUrl);
+    if (isValidCurrent) {
+      const verifiedArt = {
+        mediaId: item.id,
+        animeId: item.id,
+        anilistId: item.aniListId || null,
+        malId: item.malId || null,
+        providerId: item.providerId || null,
+        verifiedArtworkUrl: currentUrl,
+        artworkUrl: currentUrl,
+        isVerified: true,
+        verificationSource: item.artwork?.verificationSource || 'VERIFIED_ON_RECORD',
+        aspectRatio: '3/4',
+        artworkStatus: 'verified',
+        lastVerified: new Date().toISOString()
+      };
+      cache[cacheKey] = verifiedArt;
+      saveCache(cache);
+      item.artwork = verifiedArt;
+      return item;
+    }
   }
 
-  // 3. Level 2 Fallback: AniList GraphQL
-  const aniListResult = await fetchAniListArtwork(item.title, item.malId, item.aniListId);
-  if (aniListResult) {
-    const verifiedArt = {
-      mediaId: item.id,
-      animeId: item.id,
-      anilistId: aniListResult.aniListId,
-      malId: aniListResult.malId || item.malId || null,
-      providerId: item.providerId || item.providerAnimeId || null,
-      artworkUrl: aniListResult.verifiedArtworkUrl,
-      verifiedArtworkUrl: aniListResult.verifiedArtworkUrl,
-      isVerified: true,
-      artworkSource: 'ANILIST_GRAPHQL_OFFICIAL_CDN',
-      verificationSource: 'ANILIST_GRAPHQL_OFFICIAL_CDN',
-      aspectRatio: '3/4',
-      artworkStatus: 'verified',
-      lastVerified: new Date().toISOString(),
-      retryCount: 0
-    };
+  // 3. Re-resolve using EXACT AniList ID first
+  if (item.aniListId) {
+    const aniListResult = await fetchAniListArtwork(item.aniListId, null, null);
+    if (aniListResult && aniListResult.verifiedArtworkUrl) {
+      const isValidAniList = await validateArtworkUrl(aniListResult.verifiedArtworkUrl);
+      if (isValidAniList) {
+        const verifiedArt = {
+          mediaId: item.id,
+          animeId: item.id,
+          anilistId: aniListResult.aniListId || item.aniListId || null,
+          malId: aniListResult.malId || item.malId || null,
+          providerId: item.providerId || null,
+          verifiedArtworkUrl: aniListResult.verifiedArtworkUrl,
+          artworkUrl: aniListResult.verifiedArtworkUrl,
+          isVerified: true,
+          verificationSource: 'ANILIST_GRAPHQL_OFFICIAL_CDN',
+          aspectRatio: '3/4',
+          artworkStatus: 'verified',
+          lastVerified: new Date().toISOString(),
+          retryCount: 0
+        };
 
-    cache[cacheKey] = verifiedArt;
-    saveCache(cache);
-    item.artwork = verifiedArt;
-    if (aniListResult.aniListId) item.aniListId = aniListResult.aniListId;
-    if (aniListResult.malId) item.malId = aniListResult.malId;
-    return item;
+        cache[cacheKey] = verifiedArt;
+        saveCache(cache);
+        item.artwork = verifiedArt;
+        if (aniListResult.aniListId) item.aniListId = aniListResult.aniListId;
+        if (aniListResult.malId) item.malId = aniListResult.malId;
+        return item;
+      }
+    }
   }
 
-  // 4. Level 3 Fallback: MAL / Jikan API
-  const malResult = await fetchMalArtwork(item.malId, item.title);
-  if (malResult) {
-    const verifiedArt = {
-      mediaId: item.id,
-      animeId: item.id,
-      anilistId: item.aniListId || null,
-      malId: malResult.malId,
-      providerId: item.providerId || item.providerAnimeId || null,
-      artworkUrl: malResult.verifiedArtworkUrl,
-      verifiedArtworkUrl: malResult.verifiedArtworkUrl,
-      isVerified: true,
-      artworkSource: 'MAL_JIKAN_OFFICIAL_CDN',
-      verificationSource: 'MAL_JIKAN_OFFICIAL_CDN',
-      aspectRatio: '3/4',
-      artworkStatus: 'verified',
-      lastVerified: new Date().toISOString(),
-      retryCount: 0
-    };
+  // 4. Try MAL / Jikan ID second
+  if (item.malId) {
+    const aniListMalResult = await fetchAniListArtwork(null, item.malId, null);
+    if (aniListMalResult && aniListMalResult.verifiedArtworkUrl) {
+      const isValidAniListMal = await validateArtworkUrl(aniListMalResult.verifiedArtworkUrl);
+      if (isValidAniListMal) {
+        const verifiedArt = {
+          mediaId: item.id,
+          animeId: item.id,
+          anilistId: aniListMalResult.aniListId || item.aniListId || null,
+          malId: aniListMalResult.malId || item.malId || null,
+          providerId: item.providerId || null,
+          verifiedArtworkUrl: aniListMalResult.verifiedArtworkUrl,
+          artworkUrl: aniListMalResult.verifiedArtworkUrl,
+          isVerified: true,
+          verificationSource: 'ANILIST_MAL_ID_GRAPHQL_OFFICIAL_CDN',
+          aspectRatio: '3/4',
+          artworkStatus: 'verified',
+          lastVerified: new Date().toISOString(),
+          retryCount: 0
+        };
 
-    cache[cacheKey] = verifiedArt;
-    saveCache(cache);
-    item.artwork = verifiedArt;
-    if (malResult.malId) item.malId = malResult.malId;
-    return item;
+        cache[cacheKey] = verifiedArt;
+        saveCache(cache);
+        item.artwork = verifiedArt;
+        if (aniListMalResult.aniListId) item.aniListId = aniListMalResult.aniListId;
+        if (aniListMalResult.malId) item.malId = aniListMalResult.malId;
+        return item;
+      }
+    }
+
+    const malResult = await fetchMalArtwork(item.malId, null);
+    if (malResult && malResult.verifiedArtworkUrl) {
+      const isValidMal = await validateArtworkUrl(malResult.verifiedArtworkUrl);
+      if (isValidMal) {
+        const verifiedArt = {
+          mediaId: item.id,
+          animeId: item.id,
+          anilistId: item.aniListId || null,
+          malId: malResult.malId || item.malId || null,
+          providerId: item.providerId || null,
+          verifiedArtworkUrl: malResult.verifiedArtworkUrl,
+          artworkUrl: malResult.verifiedArtworkUrl,
+          isVerified: true,
+          verificationSource: 'MAL_JIKAN_OFFICIAL_CDN',
+          aspectRatio: '3/4',
+          artworkStatus: 'verified',
+          lastVerified: new Date().toISOString(),
+          retryCount: 0
+        };
+
+        cache[cacheKey] = verifiedArt;
+        saveCache(cache);
+        item.artwork = verifiedArt;
+        if (malResult.malId) item.malId = malResult.malId;
+        return item;
+      }
+    }
   }
 
-  // 5. Level 4: Add to Retry Queue if failed
+  // 5. Title search as last resort
+  const titleAniListResult = await fetchAniListArtwork(null, null, item.title);
+  if (titleAniListResult && titleAniListResult.verifiedArtworkUrl) {
+    const isValidTitleAniList = await validateArtworkUrl(titleAniListResult.verifiedArtworkUrl);
+    if (isValidTitleAniList) {
+      const verifiedArt = {
+        mediaId: item.id,
+        animeId: item.id,
+        anilistId: titleAniListResult.aniListId || item.aniListId || null,
+        malId: titleAniListResult.malId || item.malId || null,
+        providerId: item.providerId || null,
+        verifiedArtworkUrl: titleAniListResult.verifiedArtworkUrl,
+        artworkUrl: titleAniListResult.verifiedArtworkUrl,
+        isVerified: true,
+        verificationSource: 'ANILIST_TITLE_SEARCH_OFFICIAL_CDN',
+        aspectRatio: '3/4',
+        artworkStatus: 'verified',
+        lastVerified: new Date().toISOString(),
+        retryCount: 0
+      };
+
+      cache[cacheKey] = verifiedArt;
+      saveCache(cache);
+      item.artwork = verifiedArt;
+      if (titleAniListResult.aniListId) item.aniListId = titleAniListResult.aniListId;
+      if (titleAniListResult.malId) item.malId = titleAniListResult.malId;
+      return item;
+    }
+  }
+
+  const kitsuResult = await fetchKitsuArtwork(item.title);
+  if (kitsuResult && kitsuResult.verifiedArtworkUrl) {
+    const isValidKitsu = await validateArtworkUrl(kitsuResult.verifiedArtworkUrl);
+    if (isValidKitsu) {
+      const verifiedArt = {
+        mediaId: item.id,
+        animeId: item.id,
+        anilistId: item.aniListId || null,
+        malId: item.malId || null,
+        providerId: item.providerId || null,
+        verifiedArtworkUrl: kitsuResult.verifiedArtworkUrl,
+        artworkUrl: kitsuResult.verifiedArtworkUrl,
+        isVerified: true,
+        verificationSource: 'KITSU_OFFICIAL_CDN',
+        aspectRatio: '3/4',
+        artworkStatus: 'verified',
+        lastVerified: new Date().toISOString(),
+        retryCount: 0
+      };
+
+      cache[cacheKey] = verifiedArt;
+      saveCache(cache);
+      item.artwork = verifiedArt;
+      return item;
+    }
+  }
+
+  // 6. If all lookups fail, mark as pending placeholder and add to retry queue
   const queue = getRetryQueue();
-  const existingQueueIndex = queue.findIndex(q => q.animeId === item.id || q.mediaId === item.id);
-
-  let currentRetryCount = 0;
-  if (existingQueueIndex !== -1) {
-    currentRetryCount = (queue[existingQueueIndex].retryCount || 0) + 1;
-  }
+  const existingIndex = queue.findIndex(q => q.animeId === item.id || q.mediaId === item.id);
+  const currentRetryCount = existingIndex !== -1 ? (queue[existingIndex].retryCount || 0) + 1 : 0;
 
   if (currentRetryCount < 3) {
     const queueEntry = {
@@ -292,36 +506,32 @@ export async function resolveItemArtwork(item) {
       retryCount: currentRetryCount,
       lastTriedAt: new Date().toISOString()
     };
-
-    if (existingQueueIndex !== -1) queue[existingQueueIndex] = queueEntry;
+    if (existingIndex !== -1) queue[existingIndex] = queueEntry;
     else queue.push(queueEntry);
     saveRetryQueue(queue);
 
     item.artwork = {
       mediaId: item.id,
       animeId: item.id,
-      artworkUrl: DEFAULT_PLACEHOLDER,
       verifiedArtworkUrl: DEFAULT_PLACEHOLDER,
+      artworkUrl: DEFAULT_PLACEHOLDER,
       isVerified: false,
-      artworkSource: 'ANIVAULT_PLACEHOLDER_RETRY_PENDING',
+      artworkStatus: 'pending',
       verificationSource: 'ANIVAULT_PLACEHOLDER_RETRY_PENDING',
       aspectRatio: '3/4',
-      artworkStatus: 'pending',
       lastVerified: new Date().toISOString(),
       retryCount: currentRetryCount
     };
   } else {
-    // Exceeded 3 retries -> genuinely unavailable
     item.artwork = {
       mediaId: item.id,
       animeId: item.id,
-      artworkUrl: DEFAULT_PLACEHOLDER,
       verifiedArtworkUrl: DEFAULT_PLACEHOLDER,
+      artworkUrl: DEFAULT_PLACEHOLDER,
       isVerified: false,
-      artworkSource: 'ANIVAULT_PLACEHOLDER_UNAVAILABLE',
+      artworkStatus: 'unavailable',
       verificationSource: 'ANIVAULT_PLACEHOLDER_UNAVAILABLE',
       aspectRatio: '3/4',
-      artworkStatus: 'unavailable',
       lastVerified: new Date().toISOString(),
       retryCount: currentRetryCount
     };
@@ -331,129 +541,134 @@ export async function resolveItemArtwork(item) {
 }
 
 /**
- * Scan entire catalogue for missing, broken, or placeholder artwork.
- * Enqueues items that require repair and builds comprehensive status report.
+ * SCAN ENTIRE CATALOGUE & AUDIT IMAGE URL HEALTH
  */
 export async function scanArtwork() {
   const catalogue = loadMasterCatalogue();
   const queue = getRetryQueue();
 
-  let missingCount = 0;
-  let brokenCount = 0;
-  let placeholderCount = 0;
+  let totalMedia = catalogue.length;
   let verifiedCount = 0;
   let repairedCount = 0;
+  let deadRemovedCount = 0;
+  let missingCount = 0;
+  let brokenCount = 0;
   let pendingCount = 0;
   let unavailableCount = 0;
-  let failedAttempts = 0;
 
   for (const item of catalogue) {
     const art = item.artwork;
     const url = typeof art === 'string' ? art : art?.verifiedArtworkUrl || art?.artworkUrl;
     const isUnsplash = url && url.includes('unsplash.com');
-    const isMissing = !url || url.trim() === '';
-    const isBroken = url && !url.startsWith('http');
 
-    if (isMissing) {
+    if (!url || isUnsplash || !art?.isVerified) {
       missingCount++;
-    } else if (isBroken) {
-      brokenCount++;
-    } else if (isUnsplash || art?.isVerified === false || art?.artworkStatus === 'pending') {
-      placeholderCount++;
-    }
-
-    if (art?.isVerified && url && !isUnsplash && !isBroken) {
-      verifiedCount++;
-      if (art?.verificationSource === 'ANILIST_GRAPHQL_OFFICIAL_CDN' || art?.verificationSource === 'MAL_JIKAN_OFFICIAL_CDN') {
-        repairedCount++;
-      }
-    } else if (art?.artworkStatus === 'pending' || isMissing || isBroken || isUnsplash) {
-      // Enqueue if not already in queue
-      const existingInQueue = queue.find(q => q.animeId === item.id || q.mediaId === item.id);
-      if (!existingInQueue) {
-        queue.push({
-          mediaId: item.id,
-          animeId: item.id,
-          title: item.title,
-          malId: item.malId || null,
-          aniListId: item.aniListId || null,
-          retryCount: 0,
-          lastTriedAt: new Date().toISOString()
-        });
-      }
-      if (existingInQueue && existingInQueue.retryCount >= 3) {
+      if (art?.artworkStatus === 'unavailable') {
         unavailableCount++;
       } else {
         pendingCount++;
       }
     } else {
-      unavailableCount++;
+      // Test URL validity
+      const isValid = await validateArtworkUrl(url);
+      if (isValid) {
+        verifiedCount++;
+        if (art?.verificationSource === 'ANILIST_GRAPHQL_OFFICIAL_CDN' || art?.verificationSource === 'MAL_JIKAN_OFFICIAL_CDN' || art?.verificationSource === 'KITSU_OFFICIAL_CDN') {
+          repairedCount++;
+        }
+      } else {
+        // Dead/invalid URL detected!
+        deadRemovedCount++;
+        brokenCount++;
+        pendingCount++;
+        item.artwork = {
+          ...art,
+          isVerified: false,
+          artworkStatus: 'pending',
+          verifiedArtworkUrl: DEFAULT_PLACEHOLDER
+        };
+
+        const existingInQueue = queue.find(q => q.animeId === item.id || q.mediaId === item.id);
+        if (!existingInQueue) {
+          queue.push({
+            mediaId: item.id,
+            animeId: item.id,
+            title: item.title,
+            malId: item.malId || null,
+            aniListId: item.aniListId || null,
+            retryCount: 0,
+            lastTriedAt: new Date().toISOString()
+          });
+        }
+      }
     }
   }
 
   saveRetryQueue(queue);
 
-  for (const q of queue) {
-    failedAttempts += (q.retryCount || 0);
-  }
-
-  const statusReport = {
-    totalMedia: catalogue.length,
+  const auditReport = {
+    totalCatalogue: totalMedia,
+    totalMedia,
+    validArtwork: verifiedCount,
     verifiedArtwork: verifiedCount,
+    artworkRepaired: repairedCount,
+    deadArtworkUrlsRemoved: deadRemovedCount,
     missingArtwork: missingCount,
     brokenArtwork: brokenCount,
+    stillPending: pendingCount,
     pendingRepairs: pendingCount,
     currentlyRepairing: isCurrentlyRepairing,
     successfullyRepaired: repairedCount,
+    unavailable: unavailableCount,
     permanentlyUnavailable: unavailableCount,
-    failedAttempts,
     lastArtworkCheck: new Date().toISOString()
   };
 
   fs.mkdirSync(path.dirname(AUDIT_REPORT_FILE), { recursive: true });
   fs.mkdirSync(path.dirname(CLIENT_AUDIT_REPORT_FILE), { recursive: true });
 
-  fs.writeFileSync(AUDIT_REPORT_FILE, JSON.stringify(statusReport, null, 2));
-  fs.writeFileSync(CLIENT_AUDIT_REPORT_FILE, JSON.stringify(statusReport, null, 2));
+  fs.writeFileSync(AUDIT_REPORT_FILE, JSON.stringify(auditReport, null, 2));
+  fs.writeFileSync(CLIENT_AUDIT_REPORT_FILE, JSON.stringify(auditReport, null, 2));
 
-  return statusReport;
+  return auditReport;
 }
 
 /**
- * Process pending artwork repair queue in batches
+ * REPAIR CATALOGUE ARTWORK IN BATCHES
  */
 export async function repairMissingArtwork(batchSize = 25) {
   isCurrentlyRepairing = true;
-  const queue = getRetryQueue();
-  if (queue.length === 0) {
-    isCurrentlyRepairing = false;
-    return await scanArtwork();
-  }
-
-  console.log(`[Artwork Manager] Repairing missing artwork for ${Math.min(batchSize, queue.length)} queued entries...`);
-
   const catalogue = loadMasterCatalogue();
-  const batch = queue.splice(0, batchSize);
-  const remainingQueue = [...queue];
 
-  let updatedCount = 0;
+  // Find all items needing repair (unverified, dead URL, or in retry queue)
+  const itemsNeedingRepair = [];
+  for (const item of catalogue) {
+    const url = typeof item.artwork === 'string' ? item.artwork : item.artwork?.verifiedArtworkUrl || item.artwork?.artworkUrl;
+    const isUnsplash = url && url.includes('unsplash.com');
 
-  for (const qEntry of batch) {
-    const item = catalogue.find(a => a.id === qEntry.animeId || a.id === qEntry.mediaId);
-    if (!item) continue;
-
-    const resolved = await resolveItemArtwork(item);
-    if (resolved.artwork?.isVerified) {
-      updatedCount++;
-    } else if ((resolved.artwork?.retryCount || 0) < 3) {
-      remainingQueue.push({
-        ...qEntry,
-        retryCount: (resolved.artwork?.retryCount || (qEntry.retryCount || 0) + 1)
-      });
+    if (!item.artwork?.isVerified || !url || isUnsplash || item.artwork?.artworkStatus === 'pending') {
+      itemsNeedingRepair.push(item);
+    } else {
+      // Quick check if URL is valid
+      const isValid = await validateArtworkUrl(url);
+      if (!isValid) {
+        itemsNeedingRepair.push(item);
+      }
     }
   }
 
-  saveRetryQueue(remainingQueue);
+  console.log(`[Artwork Manager] Repairing artwork for ${Math.min(batchSize, itemsNeedingRepair.length)} entries out of ${itemsNeedingRepair.length} needing repair...`);
+
+  const batch = itemsNeedingRepair.slice(0, batchSize);
+  let updatedCount = 0;
+
+  for (const item of batch) {
+    const resolved = await resolveItemArtwork(item, true); // forceRefresh
+    if (resolved.artwork?.isVerified) {
+      updatedCount++;
+    }
+    await sleep(300); // Friendly pause between requests
+  }
 
   if (updatedCount > 0) {
     saveMasterCatalogue(catalogue);
@@ -464,19 +679,28 @@ export async function repairMissingArtwork(batchSize = 25) {
 }
 
 /**
- * Reset failed attempts and re-enqueue for retry
+ * RESET RETRY COUNTS AND RETRY ALL UNVERIFIED / FAILED ARTWORK
  */
 export async function retryFailedArtwork() {
   const catalogue = loadMasterCatalogue();
-  const newQueue = [];
+  const queue = [];
 
   for (const item of catalogue) {
-    const art = item.artwork;
-    const url = typeof art === 'string' ? art : art?.verifiedArtworkUrl;
+    const url = typeof item.artwork === 'string' ? item.artwork : item.artwork?.verifiedArtworkUrl;
     const isUnsplash = url && url.includes('unsplash.com');
 
-    if (!art?.isVerified || isUnsplash || art?.artworkStatus === 'pending' || art?.artworkStatus === 'unavailable') {
-      newQueue.push({
+    if (!item.artwork?.isVerified || isUnsplash || item.artwork?.artworkStatus === 'pending' || item.artwork?.artworkStatus === 'unavailable') {
+      item.artwork = {
+        mediaId: item.id,
+        animeId: item.id,
+        verifiedArtworkUrl: DEFAULT_PLACEHOLDER,
+        artworkUrl: DEFAULT_PLACEHOLDER,
+        isVerified: false,
+        artworkStatus: 'pending',
+        lastVerified: new Date().toISOString(),
+        retryCount: 0
+      };
+      queue.push({
         mediaId: item.id,
         animeId: item.id,
         title: item.title,
@@ -485,58 +709,22 @@ export async function retryFailedArtwork() {
         retryCount: 0,
         lastTriedAt: new Date().toISOString()
       });
-      item.artwork = {
-        ...item.artwork,
-        artworkStatus: 'pending',
-        retryCount: 0
-      };
     }
   }
 
-  saveRetryQueue(newQueue);
+  saveRetryQueue(queue);
   saveMasterCatalogue(catalogue);
 
   return await repairMissingArtwork(50);
 }
 
 /**
- * Run full artwork audit in batches across entire catalogue
+ * RUN FULL CATALOGUE ARTWORK REPAIR
  */
 export async function runFullArtworkAuditBatch(batchSize = 50) {
-  const catalogue = loadMasterCatalogue();
-  console.log(`[Artwork Audit] Running batched audit across ${catalogue.length} catalogue records (batch size: ${batchSize})...`);
-
-  for (let i = 0; i < catalogue.length; i += batchSize) {
-    const batch = catalogue.slice(i, i + batchSize);
-    for (const item of batch) {
-      const url = typeof item.artwork === 'string' ? item.artwork : item.artwork?.verifiedArtworkUrl;
-      const isUnsplash = url && url.includes('unsplash.com');
-
-      if (!item.artwork || !url || isUnsplash || item.artwork?.isVerified === false) {
-        if (!item.artwork?.artworkStatus) {
-          item.artwork = {
-            mediaId: item.id,
-            animeId: item.id,
-            verifiedArtworkUrl: url || DEFAULT_PLACEHOLDER,
-            artworkUrl: url || DEFAULT_PLACEHOLDER,
-            isVerified: false,
-            artworkStatus: 'pending',
-            artworkSource: 'ANIVAULT_PLACEHOLDER_RETRY_PENDING',
-            lastVerified: new Date().toISOString(),
-            retryCount: 0
-          };
-        }
-      }
-    }
-  }
-
-  saveMasterCatalogue(catalogue);
-  return await scanArtwork();
+  return await repairMissingArtwork(batchSize);
 }
 
-/**
- * Backwards compatibility export
- */
 export async function processArtworkRetryQueue() {
   return await repairMissingArtwork(25);
 }
@@ -548,3 +736,4 @@ export async function runArtworkAudit() {
 export async function getArtworkManagerStatus() {
   return await scanArtwork();
 }
+

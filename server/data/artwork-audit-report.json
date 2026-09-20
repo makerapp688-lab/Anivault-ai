@@ -1,12 +1,17 @@
 {
+  "totalCatalogue": 401,
   "totalMedia": 401,
-  "verifiedArtwork": 390,
-  "missingArtwork": 0,
-  "brokenArtwork": 0,
-  "pendingRepairs": 11,
-  "currentlyRepairing": true,
-  "successfullyRepaired": 17,
+  "validArtwork": 188,
+  "verifiedArtwork": 188,
+  "artworkRepaired": 1,
+  "deadArtworkUrlsRemoved": 186,
+  "missingArtwork": 27,
+  "brokenArtwork": 186,
+  "stillPending": 213,
+  "pendingRepairs": 213,
+  "currentlyRepairing": false,
+  "successfullyRepaired": 1,
+  "unavailable": 0,
   "permanentlyUnavailable": 0,
-  "failedAttempts": 17,
-  "lastArtworkCheck": "2026-09-20T16:07:05.947Z"
+  "lastArtworkCheck": "2026-09-20T16:29:56.827Z"
 }

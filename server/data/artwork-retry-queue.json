@@ -59,8 +59,8 @@
     "title": "Contact Us",
     "malId": null,
     "aniListId": null,
-    "retryCount": 1,
-    "lastTriedAt": "2026-09-20T16:05:32.289Z"
+    "retryCount": 2,
+    "lastTriedAt": "2026-09-20T16:33:00.837Z"
   },
   {
     "mediaId": "anivault_rt_dc_league_of_super_pets_2022_movie_hindi_dubbed",
@@ -68,8 +68,8 @@
     "title": "Dc League Of Super Pets 2022 Movie Hindi Dubbed",
     "malId": null,
     "aniListId": null,
-    "retryCount": 1,
-    "lastTriedAt": "2026-09-20T16:05:32.289Z"
+    "retryCount": 2,
+    "lastTriedAt": "2026-09-20T16:33:01.932Z"
   },
   {
     "mediaId": "anivault_rt_my_hero_academia_season_4_hindi_dubbed_episodes",
@@ -95,7 +95,1753 @@
     "title": "Jujutsu Kaisen Execution 2025 Movie English Subbed",
     "malId": null,
     "aniListId": null,
+    "retryCount": 2,
+    "lastTriedAt": "2026-09-20T16:33:02.616Z"
+  },
+  {
+    "mediaId": "mal_578",
+    "animeId": "mal_578",
+    "title": "Grave of the Fireflies",
+    "malId": 578,
+    "aniListId": 578,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:45.944Z"
+  },
+  {
+    "mediaId": "mal_572",
+    "animeId": "mal_572",
+    "title": "Nausicaä of the Valley of the Wind",
+    "malId": 572,
+    "aniListId": 572,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:46.988Z"
+  },
+  {
+    "mediaId": "mal_199",
+    "animeId": "mal_199",
+    "title": "Spirited Away",
+    "malId": 199,
+    "aniListId": 199,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:47.722Z"
+  },
+  {
+    "mediaId": "mal_32281",
+    "animeId": "mal_32281",
+    "title": "Your Name.",
+    "malId": 32281,
+    "aniListId": 21519,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:47.878Z"
+  },
+  {
+    "mediaId": "mal_28851",
+    "animeId": "mal_28851",
+    "title": "A Silent Voice",
+    "malId": 28851,
+    "aniListId": 20954,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:47.958Z"
+  },
+  {
+    "mediaId": "mal_164",
+    "animeId": "mal_164",
+    "title": "Princess Mononoke",
+    "malId": 164,
+    "aniListId": 164,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:48.023Z"
+  },
+  {
+    "mediaId": "mal_431",
+    "animeId": "mal_431",
+    "title": "Howl's Moving Castle",
+    "malId": 431,
+    "aniListId": 431,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:48.099Z"
+  },
+  {
+    "mediaId": "mal_50594",
+    "animeId": "mal_50594",
+    "title": "Suzume",
+    "malId": 50594,
+    "aniListId": 145946,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:48.165Z"
+  },
+  {
+    "mediaId": "mal_38826",
+    "animeId": "mal_38826",
+    "title": "Weathering With You",
+    "malId": 38826,
+    "aniListId": 106286,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:48.272Z"
+  },
+  {
+    "mediaId": "mal_40456",
+    "animeId": "mal_40456",
+    "title": "Demon Slayer: Kimetsu no Yaiba - The Movie: Mugen Train",
+    "malId": 40456,
+    "aniListId": 112151,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:48.386Z"
+  },
+  {
+    "mediaId": "mal_48561",
+    "animeId": "mal_48561",
+    "title": "Jujutsu Kaisen 0",
+    "malId": 48561,
+    "aniListId": 131573,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:48.467Z"
+  },
+  {
+    "mediaId": "mal_36946",
+    "animeId": "mal_36946",
+    "title": "Dragon Ball Super: Broly",
+    "malId": 36946,
+    "aniListId": 101302,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:48.545Z"
+  },
+  {
+    "mediaId": "mal_48903",
+    "animeId": "mal_48903",
+    "title": "Dragon Ball Super: Super Hero",
+    "malId": 48903,
+    "aniListId": 133373,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:48.598Z"
+  },
+  {
+    "mediaId": "mal_50410",
+    "animeId": "mal_50410",
+    "title": "One Piece Film: Red",
+    "malId": 50410,
+    "aniListId": 141887,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:48.660Z"
+  },
+  {
+    "mediaId": "mal_12859",
+    "animeId": "mal_12859",
+    "title": "One Piece Film: Z",
+    "malId": 12859,
+    "aniListId": 12859,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:48.727Z"
+  },
+  {
+    "mediaId": "mal_31490",
+    "animeId": "mal_31490",
+    "title": "One Piece Film: Gold",
+    "malId": 31490,
+    "aniListId": 21323,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:48.858Z"
+  },
+  {
+    "mediaId": "mal_38234",
+    "animeId": "mal_38234",
+    "title": "One Piece: Stampede",
+    "malId": 38234,
+    "aniListId": 104578,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:48.924Z"
+  },
+  {
+    "mediaId": "mal_16870",
+    "animeId": "mal_16870",
+    "title": "The Last: Naruto the Movie",
+    "malId": 16870,
+    "aniListId": 16870,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:49.005Z"
+  },
+  {
+    "mediaId": "mal_13667",
+    "animeId": "mal_13667",
+    "title": "Road to Ninja: Naruto the Movie",
+    "malId": 13667,
+    "aniListId": 13667,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:49.130Z"
+  },
+  {
+    "mediaId": "mal_28755",
+    "animeId": "mal_28755",
+    "title": "Boruto: Naruto the Movie",
+    "malId": 28755,
+    "aniListId": 20921,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:49.203Z"
+  },
+  {
+    "mediaId": "mal_6325",
+    "animeId": "mal_6325",
+    "title": "Naruto Shippuden the Movie: The Will of Fire",
+    "malId": 6325,
+    "aniListId": 6325,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:49.284Z"
+  },
+  {
+    "mediaId": "mal_8246",
+    "animeId": "mal_8246",
+    "title": "Naruto Shippuden the Movie: The Lost Tower",
+    "malId": 8246,
+    "aniListId": 8246,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:49.372Z"
+  },
+  {
+    "mediaId": "mal_1686",
+    "animeId": "mal_1686",
+    "title": "Bleach: Memories of Nobody",
+    "malId": 1686,
+    "aniListId": 1686,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:49.449Z"
+  },
+  {
+    "mediaId": "mal_2889",
+    "animeId": "mal_2889",
+    "title": "Bleach: The DiamondDust Rebellion",
+    "malId": 2889,
+    "aniListId": 2889,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:49.521Z"
+  },
+  {
+    "mediaId": "mal_4835",
+    "animeId": "mal_4835",
+    "title": "Bleach: Fade to Black",
+    "malId": 4835,
+    "aniListId": 4835,
     "retryCount": 1,
-    "lastTriedAt": "2026-09-20T16:05:32.289Z"
+    "lastTriedAt": "2026-09-20T16:32:59.455Z"
+  },
+  {
+    "mediaId": "mal_8247",
+    "animeId": "mal_8247",
+    "title": "Bleach: Hell Verse",
+    "malId": 8247,
+    "aniListId": 8247,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:33:00.562Z"
+  },
+  {
+    "mediaId": "mal_36896",
+    "animeId": "mal_36896",
+    "title": "My Hero Academia: Two Heroes",
+    "malId": 36896,
+    "aniListId": 100783,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:33:01.680Z"
+  },
+  {
+    "mediaId": "mal_39565",
+    "animeId": "mal_39565",
+    "title": "My Hero Academia: Heroes Rising",
+    "malId": 39565,
+    "aniListId": 108557,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:33:02.788Z"
+  },
+  {
+    "mediaId": "mal_44200",
+    "animeId": "mal_44200",
+    "title": "My Hero Academia: World Heroes' Mission",
+    "malId": 44200,
+    "aniListId": 126938,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:33:03.922Z"
+  },
+  {
+    "mediaId": "mal_25537",
+    "animeId": "mal_25537",
+    "title": "Fate/stay night: Heaven's Feel I. presage flower",
+    "malId": 25537,
+    "aniListId": 20791,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:33:05.019Z"
+  },
+  {
+    "mediaId": "mal_33049",
+    "animeId": "mal_33049",
+    "title": "Fate/stay night: Heaven's Feel II. lost butterfly",
+    "malId": 33049,
+    "aniListId": 100192,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:33:06.130Z"
+  },
+  {
+    "mediaId": "mal_33050",
+    "animeId": "mal_33050",
+    "title": "Fate/stay night: Heaven's Feel III. spring song",
+    "malId": 33050,
+    "aniListId": 100193,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:33:07.245Z"
+  },
+  {
+    "mediaId": "mal_31765",
+    "animeId": "mal_31765",
+    "title": "Sword Art Online the Movie: Ordinal Scale",
+    "malId": 31765,
+    "aniListId": 21421,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:33:08.350Z"
+  },
+  {
+    "mediaId": "mal_42916",
+    "animeId": "mal_42916",
+    "title": "Sword Art Online the Movie: Progressive - Aria of a Starless Night",
+    "malId": 42916,
+    "aniListId": 124140,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:33:09.461Z"
+  },
+  {
+    "mediaId": "mal_47",
+    "animeId": "mal_47",
+    "title": "Akira",
+    "malId": 47,
+    "aniListId": 47,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:50.484Z"
+  },
+  {
+    "mediaId": "mal_43",
+    "animeId": "mal_43",
+    "title": "Ghost in the Shell",
+    "malId": 43,
+    "aniListId": 43,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:50.553Z"
+  },
+  {
+    "mediaId": "mal_437",
+    "animeId": "mal_437",
+    "title": "Perfect Blue",
+    "malId": 437,
+    "aniListId": 437,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:50.673Z"
+  },
+  {
+    "mediaId": "mal_1943",
+    "animeId": "mal_1943",
+    "title": "Paprika",
+    "malId": 1943,
+    "aniListId": 1943,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:50.796Z"
+  },
+  {
+    "mediaId": "mal_2236",
+    "animeId": "mal_2236",
+    "title": "The Girl Who Leapt Through Time",
+    "malId": 2236,
+    "aniListId": 2236,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:50.859Z"
+  },
+  {
+    "mediaId": "mal_12355",
+    "animeId": "mal_12355",
+    "title": "Wolf Children",
+    "malId": 12355,
+    "aniListId": 12355,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:50.939Z"
+  },
+  {
+    "mediaId": "mal_5681",
+    "animeId": "mal_5681",
+    "title": "Summer Wars",
+    "malId": 5681,
+    "aniListId": 5681,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:51.019Z"
+  },
+  {
+    "mediaId": "mal_28805",
+    "animeId": "mal_28805",
+    "title": "The Boy and the Beast",
+    "malId": 28805,
+    "aniListId": 20981,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:51.091Z"
+  },
+  {
+    "mediaId": "mal_1689",
+    "animeId": "mal_1689",
+    "title": "5 Centimeters per Second",
+    "malId": 1689,
+    "aniListId": 1689,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:51.170Z"
+  },
+  {
+    "mediaId": "mal_16782",
+    "animeId": "mal_16782",
+    "title": "The Garden of Words",
+    "malId": 16782,
+    "aniListId": 16782,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:51.234Z"
+  },
+  {
+    "mediaId": "mal_36098",
+    "animeId": "mal_36098",
+    "title": "I Want to Eat Your Pancreas",
+    "malId": 36098,
+    "aniListId": 99750,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:51.301Z"
+  },
+  {
+    "mediaId": "mal_513",
+    "animeId": "mal_513",
+    "title": "Castle in the Sky",
+    "malId": 513,
+    "aniListId": 513,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:51.540Z"
+  },
+  {
+    "mediaId": "mal_523",
+    "animeId": "mal_523",
+    "title": "My Neighbor Totoro",
+    "malId": 523,
+    "aniListId": 523,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:51.620Z"
+  },
+  {
+    "mediaId": "mal_512",
+    "animeId": "mal_512",
+    "title": "Kiki's Delivery Service",
+    "malId": 512,
+    "aniListId": 512,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:51.685Z"
+  },
+  {
+    "mediaId": "mal_892",
+    "animeId": "mal_892",
+    "title": "Porco Rosso",
+    "malId": 892,
+    "aniListId": 892,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:51.741Z"
+  },
+  {
+    "mediaId": "mal_585",
+    "animeId": "mal_585",
+    "title": "Whisper of the Heart",
+    "malId": 585,
+    "aniListId": 585,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:51.875Z"
+  },
+  {
+    "mediaId": "mal_597",
+    "animeId": "mal_597",
+    "title": "The Cat Returns",
+    "malId": 597,
+    "aniListId": 597,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:51.948Z"
+  },
+  {
+    "mediaId": "mal_2890",
+    "animeId": "mal_2890",
+    "title": "Ponyo",
+    "malId": 2890,
+    "aniListId": 2890,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:52.019Z"
+  },
+  {
+    "mediaId": "mal_7711",
+    "animeId": "mal_7711",
+    "title": "The Secret World of Arrietty",
+    "malId": 7711,
+    "aniListId": 7711,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:52.099Z"
+  },
+  {
+    "mediaId": "mal_16662",
+    "animeId": "mal_16662",
+    "title": "The Wind Rises",
+    "malId": 16662,
+    "aniListId": 16662,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:52.153Z"
+  },
+  {
+    "mediaId": "mal_16524",
+    "animeId": "mal_16524",
+    "title": "The Tale of the Princess Kaguya",
+    "malId": 16524,
+    "aniListId": 16524,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:52.226Z"
+  },
+  {
+    "mediaId": "mal_21557",
+    "animeId": "mal_21557",
+    "title": "When Marnie Was There",
+    "malId": 21557,
+    "aniListId": 20555,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:52.338Z"
+  },
+  {
+    "mediaId": "mal_37624",
+    "animeId": "mal_37624",
+    "title": "The Boy and the Heron",
+    "malId": 37624,
+    "aniListId": 101633,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:52.415Z"
+  },
+  {
+    "mediaId": "mal_1033",
+    "animeId": "mal_1033",
+    "title": "Millennium Actress",
+    "malId": 1033,
+    "aniListId": 1033,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:52.555Z"
+  },
+  {
+    "mediaId": "mal_759",
+    "animeId": "mal_759",
+    "title": "Tokyo Godfathers",
+    "malId": 759,
+    "aniListId": 759,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:52.617Z"
+  },
+  {
+    "mediaId": "mal_35848",
+    "animeId": "mal_35848",
+    "title": "Promare",
+    "malId": 35848,
+    "aniListId": 99425,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:52.684Z"
+  },
+  {
+    "mediaId": "mal_6675",
+    "animeId": "mal_6675",
+    "title": "Redline",
+    "malId": 6675,
+    "aniListId": 6675,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:52.766Z"
+  },
+  {
+    "mediaId": "mal_33674",
+    "animeId": "mal_33674",
+    "title": "No Game No Life: Zero",
+    "malId": 33674,
+    "aniListId": 21875,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:52.841Z"
+  },
+  {
+    "mediaId": "mal_38040",
+    "animeId": "mal_38040",
+    "title": "KonoSuba: God's Blessing on this Wonderful World! - Legend of Crimson",
+    "malId": 38040,
+    "aniListId": 102976,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:52.909Z"
+  },
+  {
+    "mediaId": "mal_38329",
+    "animeId": "mal_38329",
+    "title": "Rascal Does Not Dream of a Dreaming Girl",
+    "malId": 38329,
+    "aniListId": 104157,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:52.989Z"
+  },
+  {
+    "mediaId": "mal_37987",
+    "animeId": "mal_37987",
+    "title": "Violet Evergarden: The Movie",
+    "malId": 37987,
+    "aniListId": 103047,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:53.103Z"
+  },
+  {
+    "mediaId": "mal_39741",
+    "animeId": "mal_39741",
+    "title": "Violet Evergarden: Eternity and the Auto Memory Doll",
+    "malId": 39741,
+    "aniListId": 109190,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:53.181Z"
+  },
+  {
+    "mediaId": "mal_39486",
+    "animeId": "mal_39486",
+    "title": "Gintama: The Very Final",
+    "malId": 39486,
+    "aniListId": 108356,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:53.247Z"
+  },
+  {
+    "mediaId": "mal_38770",
+    "animeId": "mal_38770",
+    "title": "Detective Conan: The Fist of Blue Sapphire",
+    "malId": 38770,
+    "aniListId": 105828,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:53.325Z"
+  },
+  {
+    "mediaId": "mal_50338",
+    "animeId": "mal_50338",
+    "title": "Detective Conan: The Bride of Halloween",
+    "malId": 50338,
+    "aniListId": 141221,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:53.394Z"
+  },
+  {
+    "mediaId": "mal_53528",
+    "animeId": "mal_53528",
+    "title": "Detective Conan: Black Iron Submarine",
+    "malId": 53528,
+    "aniListId": 156388,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:53.458Z"
+  },
+  {
+    "mediaId": "mal_48674",
+    "animeId": "mal_48674",
+    "title": "Black Clover: Sword of the Wizard King",
+    "malId": 48674,
+    "aniListId": 131825,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:53.564Z"
+  },
+  {
+    "mediaId": "mal_35988",
+    "animeId": "mal_35988",
+    "title": "The Seven Deadly Sins the Movie: Prisoners of the Sky",
+    "malId": 35988,
+    "aniListId": 99655,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:53.639Z"
+  },
+  {
+    "mediaId": "mal_45788",
+    "animeId": "mal_45788",
+    "title": "The Seven Deadly Sins: Cursed by Light",
+    "malId": 45788,
+    "aniListId": 128990,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:53.750Z"
+  },
+  {
+    "mediaId": "mal_13271",
+    "animeId": "mal_13271",
+    "title": "Hunter x Hunter: Phantom Rouge",
+    "malId": 13271,
+    "aniListId": 13271,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:53.818Z"
+  },
+  {
+    "mediaId": "mal_19951",
+    "animeId": "mal_19951",
+    "title": "Hunter x Hunter: The Last Mission",
+    "malId": 19951,
+    "aniListId": 19951,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:53.889Z"
+  },
+  {
+    "mediaId": "mal_21339",
+    "animeId": "mal_21339",
+    "title": "Psycho-Pass: The Movie",
+    "malId": 21339,
+    "aniListId": 20514,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:53.961Z"
+  },
+  {
+    "mediaId": "mal_52932",
+    "animeId": "mal_52932",
+    "title": "Psycho-Pass Providence",
+    "malId": 52932,
+    "aniListId": 154388,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:54.075Z"
+  },
+  {
+    "mediaId": "mal_11577",
+    "animeId": "mal_11577",
+    "title": "Steins;Gate: The Movie − Load Region of Déjà Vu",
+    "malId": 11577,
+    "aniListId": 11577,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:54.204Z"
+  },
+  {
+    "mediaId": "mal_34437",
+    "animeId": "mal_34437",
+    "title": "Code Geass: Lelouch of the Re;surrection",
+    "malId": 34437,
+    "aniListId": 97880,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:54.277Z"
+  },
+  {
+    "mediaId": "mal_2759",
+    "animeId": "mal_2759",
+    "title": "Evangelion: 1.0 You Are (Not) Alone",
+    "malId": 2759,
+    "aniListId": 2759,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:54.396Z"
+  },
+  {
+    "mediaId": "mal_3784",
+    "animeId": "mal_3784",
+    "title": "Evangelion: 2.0 You Can (Not) Advance",
+    "malId": 3784,
+    "aniListId": 3784,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:54.463Z"
+  },
+  {
+    "mediaId": "mal_3785",
+    "animeId": "mal_3785",
+    "title": "Evangelion: 3.0 You Can (Not) Redo",
+    "malId": 3785,
+    "aniListId": 3785,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:54.530Z"
+  },
+  {
+    "mediaId": "mal_3786",
+    "animeId": "mal_3786",
+    "title": "Evangelion: 3.0+1.0 Thrice Upon a Time",
+    "malId": 3786,
+    "aniListId": 3786,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:54.601Z"
+  },
+  {
+    "mediaId": "mal_58125",
+    "animeId": "mal_58125",
+    "title": "Look Back",
+    "malId": 58125,
+    "aniListId": 175928,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:54.672Z"
+  },
+  {
+    "mediaId": "mal_45652",
+    "animeId": "mal_45652",
+    "title": "The First Slam Dunk",
+    "malId": 45652,
+    "aniListId": 128695,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:54.743Z"
+  },
+  {
+    "mediaId": "mal_50183",
+    "animeId": "mal_50183",
+    "title": "Blue Giant",
+    "malId": 50183,
+    "aniListId": 140498,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:54.809Z"
+  },
+  {
+    "mediaId": "mal_44807",
+    "animeId": "mal_44807",
+    "title": "Belle",
+    "malId": 44807,
+    "aniListId": 127986,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:54.871Z"
+  },
+  {
+    "mediaId": "mal_36936",
+    "animeId": "mal_36936",
+    "title": "Mirai",
+    "malId": 36936,
+    "aniListId": 100749,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:54.946Z"
+  },
+  {
+    "mediaId": "mal_15227",
+    "animeId": "mal_15227",
+    "title": "In This Corner of the World",
+    "malId": 15227,
+    "aniListId": 15227,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:55.014Z"
+  },
+  {
+    "mediaId": "mal_35851",
+    "animeId": "mal_35851",
+    "title": "Maquia: When the Promised Flower Blooms",
+    "malId": 35851,
+    "aniListId": 99450,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:55.087Z"
+  },
+  {
+    "mediaId": "mal_40787",
+    "animeId": "mal_40787",
+    "title": "Josee, the Tiger and the Fish",
+    "malId": 40787,
+    "aniListId": 113596,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:55.158Z"
+  },
+  {
+    "mediaId": "mal_39175",
+    "animeId": "mal_39175",
+    "title": "Words Bubble Up Like Soda Pop",
+    "malId": 39175,
+    "aniListId": 107625,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:55.278Z"
+  },
+  {
+    "mediaId": "mal_41402",
+    "animeId": "mal_41402",
+    "title": "A Whisker Away",
+    "malId": 41402,
+    "aniListId": 114963,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:55.380Z"
+  },
+  {
+    "mediaId": "mal_50549",
+    "animeId": "mal_50549",
+    "title": "Bubble",
+    "malId": 50549,
+    "aniListId": 142495,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:55.443Z"
+  },
+  {
+    "mediaId": "mal_49938",
+    "animeId": "mal_49938",
+    "title": "Drifting Home",
+    "malId": 49938,
+    "aniListId": 139942,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:55.547Z"
+  },
+  {
+    "mediaId": "mal_50593",
+    "animeId": "mal_50593",
+    "title": "The Tunnel to Summer, the Exit of Goodbyes",
+    "malId": 50593,
+    "aniListId": 142769,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:55.620Z"
+  },
+  {
+    "mediaId": "mal_42847",
+    "animeId": "mal_42847",
+    "title": "Sing a Bit of Harmony",
+    "malId": 42847,
+    "aniListId": 123898,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:55.723Z"
+  },
+  {
+    "mediaId": "mal_38735",
+    "animeId": "mal_38735",
+    "title": "Ride Your Wave",
+    "malId": 38735,
+    "aniListId": 105807,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:55.814Z"
+  },
+  {
+    "mediaId": "mal_34792",
+    "animeId": "mal_34792",
+    "title": "Lu Over the Wall",
+    "malId": 34792,
+    "aniListId": 98449,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:55.891Z"
+  },
+  {
+    "mediaId": "mal_34537",
+    "animeId": "mal_34537",
+    "title": "The Night Is Short, Walk on Girl",
+    "malId": 34537,
+    "aniListId": 97917,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:55.960Z"
+  },
+  {
+    "mediaId": "mal_2418",
+    "animeId": "mal_2418",
+    "title": "Sword of the Stranger",
+    "malId": 2418,
+    "aniListId": 2418,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:56.029Z"
+  },
+  {
+    "mediaId": "mal_617",
+    "animeId": "mal_617",
+    "title": "Ninja Scroll",
+    "malId": 617,
+    "aniListId": 617,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:56.109Z"
+  },
+  {
+    "mediaId": "mal_543",
+    "animeId": "mal_543",
+    "title": "Vampire Hunter D: Bloodlust",
+    "malId": 543,
+    "aniListId": 543,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:56.178Z"
+  },
+  {
+    "mediaId": "mal_570",
+    "animeId": "mal_570",
+    "title": "Jin-Roh: The Wolf Brigade",
+    "malId": 570,
+    "aniListId": 570,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:56.264Z"
+  },
+  {
+    "mediaId": "mal_1462",
+    "animeId": "mal_1462",
+    "title": "Memories",
+    "malId": 1462,
+    "aniListId": 1462,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:56.405Z"
+  },
+  {
+    "mediaId": "mal_1095",
+    "animeId": "mal_1095",
+    "title": "Patlabor: The Movie",
+    "malId": 1095,
+    "aniListId": 1095,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:56.477Z"
+  },
+  {
+    "mediaId": "mal_1096",
+    "animeId": "mal_1096",
+    "title": "Patlabor 2: The Movie",
+    "malId": 1096,
+    "aniListId": 1096,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:56.550Z"
+  },
+  {
+    "mediaId": "mal_522",
+    "animeId": "mal_522",
+    "title": "Metropolis",
+    "malId": 522,
+    "aniListId": 522,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:56.617Z"
+  },
+  {
+    "mediaId": "mal_2104",
+    "animeId": "mal_2104",
+    "title": "Tekkonkinkreet",
+    "malId": 2104,
+    "aniListId": 2104,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:56.733Z"
+  },
+  {
+    "mediaId": "mal_53887",
+    "animeId": "mal_53887",
+    "title": "Spy x Family Code: White",
+    "malId": 53887,
+    "aniListId": 158870,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:56.834Z"
+  },
+  {
+    "mediaId": "mal_52742",
+    "animeId": "mal_52742",
+    "title": "Haikyu!! The Dumpster Battle",
+    "malId": 52742,
+    "aniListId": 153724,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:56.957Z"
+  },
+  {
+    "mediaId": "mal_54865",
+    "animeId": "mal_54865",
+    "title": "Blue Lock: Episode Nagi",
+    "malId": 54865,
+    "aniListId": 163270,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:57.070Z"
+  },
+  {
+    "mediaId": "mal_48895",
+    "animeId": "mal_48895",
+    "title": "Overlord: The Sacred Kingdom",
+    "malId": 48895,
+    "aniListId": 133338,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:57.202Z"
+  },
+  {
+    "mediaId": "mal_40382",
+    "animeId": "mal_40382",
+    "title": "Inu-Oh",
+    "malId": 40382,
+    "aniListId": 111958,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:57.303Z"
+  },
+  {
+    "mediaId": "mal_37765",
+    "animeId": "mal_37765",
+    "title": "Mobile Suit Gundam: Hathaway",
+    "malId": 37765,
+    "aniListId": 105596,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:57.381Z"
+  },
+  {
+    "mediaId": "mal_48845",
+    "animeId": "mal_48845",
+    "title": "Summer Ghost",
+    "malId": 48845,
+    "aniListId": 130003,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:57.444Z"
+  },
+  {
+    "mediaId": "mal_38015",
+    "animeId": "mal_38015",
+    "title": "The Deer King",
+    "malId": 38015,
+    "aniListId": 101586,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:57.521Z"
+  },
+  {
+    "mediaId": "mal_41361",
+    "animeId": "mal_41361",
+    "title": "Pompo: The Cinéphile",
+    "malId": 41361,
+    "aniListId": 112319,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:57.622Z"
+  },
+  {
+    "mediaId": "mal_16498",
+    "animeId": "mal_16498",
+    "title": "Attack on Titan",
+    "malId": 16498,
+    "aniListId": 16498,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:57.706Z"
+  },
+  {
+    "mediaId": "mal_38000",
+    "animeId": "mal_38000",
+    "title": "Demon Slayer: Kimetsu no Yaiba",
+    "malId": 38000,
+    "aniListId": 101921,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:57.776Z"
+  },
+  {
+    "mediaId": "mal_40748",
+    "animeId": "mal_40748",
+    "title": "Jujutsu Kaisen",
+    "malId": 40748,
+    "aniListId": 113415,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:57.849Z"
+  },
+  {
+    "mediaId": "mal_20",
+    "animeId": "mal_20",
+    "title": "Naruto",
+    "malId": 20,
+    "aniListId": 20,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:57.918Z"
+  },
+  {
+    "mediaId": "mal_1735",
+    "animeId": "mal_1735",
+    "title": "Naruto: Shippuden",
+    "malId": 1735,
+    "aniListId": 1735,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:58.072Z"
+  },
+  {
+    "mediaId": "mal_1535",
+    "animeId": "mal_1535",
+    "title": "Death Note",
+    "malId": 1535,
+    "aniListId": 1535,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:58.153Z"
+  },
+  {
+    "mediaId": "mal_5114",
+    "animeId": "mal_5114",
+    "title": "Fullmetal Alchemist: Brotherhood",
+    "malId": 5114,
+    "aniListId": 5114,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:58.237Z"
+  },
+  {
+    "mediaId": "mal_31964",
+    "animeId": "mal_31964",
+    "title": "My Hero Academia",
+    "malId": 31964,
+    "aniListId": 21459,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:58.308Z"
+  },
+  {
+    "mediaId": "mal_52299",
+    "animeId": "mal_52299",
+    "title": "Solo Leveling",
+    "malId": 52299,
+    "aniListId": 151807,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:58.385Z"
+  },
+  {
+    "mediaId": "mal_38691",
+    "animeId": "mal_38691",
+    "title": "Dr. STONE",
+    "malId": 38691,
+    "aniListId": 105333,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:58.504Z"
+  },
+  {
+    "mediaId": "mal_35507",
+    "animeId": "mal_35507",
+    "title": "Classroom of the Elite",
+    "malId": 35507,
+    "aniListId": 98659,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:58.589Z"
+  },
+  {
+    "mediaId": "mal_9253",
+    "animeId": "mal_9253",
+    "title": "Steins;Gate",
+    "malId": 9253,
+    "aniListId": 9253,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:58.662Z"
+  },
+  {
+    "mediaId": "mal_32182",
+    "animeId": "mal_32182",
+    "title": "Mob Psycho 100",
+    "malId": 32182,
+    "aniListId": 21507,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:58.728Z"
+  },
+  {
+    "mediaId": "mal_1575",
+    "animeId": "mal_1575",
+    "title": "Code Geass: Lelouch of the Rebellion",
+    "malId": 1575,
+    "aniListId": 1575,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:58.806Z"
+  },
+  {
+    "mediaId": "mal_11061",
+    "animeId": "mal_11061",
+    "title": "Hunter x Hunter (2011)",
+    "malId": 11061,
+    "aniListId": 11061,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:58.954Z"
+  },
+  {
+    "mediaId": "mal_1",
+    "animeId": "mal_1",
+    "title": "Cowboy Bebop",
+    "malId": 1,
+    "aniListId": 1,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:59.023Z"
+  },
+  {
+    "mediaId": "mal_19",
+    "animeId": "mal_19",
+    "title": "Monster",
+    "malId": 19,
+    "aniListId": 19,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:59.127Z"
+  },
+  {
+    "mediaId": "mal_30",
+    "animeId": "mal_30",
+    "title": "Neon Genesis Evangelion",
+    "malId": 30,
+    "aniListId": 30,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:59.267Z"
+  },
+  {
+    "mediaId": "mal_33352",
+    "animeId": "mal_33352",
+    "title": "Violet Evergarden",
+    "malId": 33352,
+    "aniListId": 21827,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:59.404Z"
+  },
+  {
+    "mediaId": "mal_37521",
+    "animeId": "mal_37521",
+    "title": "Vinland Saga",
+    "malId": 37521,
+    "aniListId": 101348,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:59.470Z"
+  },
+  {
+    "mediaId": "mal_52991",
+    "animeId": "mal_52991",
+    "title": "Frieren: Beyond Journey's End",
+    "malId": 52991,
+    "aniListId": 154587,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:59.537Z"
+  },
+  {
+    "mediaId": "mal_57334",
+    "animeId": "mal_57334",
+    "title": "Dan Da Dan",
+    "malId": 57334,
+    "aniListId": 171018,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:59.611Z"
+  },
+  {
+    "mediaId": "mal_52588",
+    "animeId": "mal_52588",
+    "title": "Kaiju No. 8",
+    "malId": 52588,
+    "aniListId": 153288,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:59.693Z"
+  },
+  {
+    "mediaId": "mal_58418",
+    "animeId": "mal_58418",
+    "title": "Sakamoto Days",
+    "malId": 58418,
+    "aniListId": 176162,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:59.766Z"
+  },
+  {
+    "mediaId": "mal_20583",
+    "animeId": "mal_20583",
+    "title": "Haikyu!!",
+    "malId": 20583,
+    "aniListId": 20464,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:59.878Z"
+  },
+  {
+    "mediaId": "mal_11771",
+    "animeId": "mal_11771",
+    "title": "Kuroko's Basketball",
+    "malId": 11771,
+    "aniListId": 11771,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:28:59.958Z"
+  },
+  {
+    "mediaId": "mal_170",
+    "animeId": "mal_170",
+    "title": "Slam Dunk",
+    "malId": 170,
+    "aniListId": 170,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:00.037Z"
+  },
+  {
+    "mediaId": "mal_263",
+    "animeId": "mal_263",
+    "title": "Hajime no Ippo",
+    "malId": 263,
+    "aniListId": 263,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:00.168Z"
+  },
+  {
+    "mediaId": "mal_48583",
+    "animeId": "mal_48583",
+    "title": "Blue Lock",
+    "malId": 48583,
+    "aniListId": 137822,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:00.239Z"
+  },
+  {
+    "mediaId": "mal_22535",
+    "animeId": "mal_22535",
+    "title": "Parasyte -the maxim-",
+    "malId": 22535,
+    "aniListId": 20623,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:00.306Z"
+  },
+  {
+    "mediaId": "mal_22319",
+    "animeId": "mal_22319",
+    "title": "Tokyo Ghoul",
+    "malId": 22319,
+    "aniListId": 20605,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:00.373Z"
+  },
+  {
+    "mediaId": "mal_777",
+    "animeId": "mal_777",
+    "title": "Hellsing Ultimate",
+    "malId": 777,
+    "aniListId": 777,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:00.429Z"
+  },
+  {
+    "mediaId": "mal_48483",
+    "animeId": "mal_48483",
+    "title": "Mieruko-chan",
+    "malId": 48483,
+    "aniListId": 131083,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:30:01.403Z"
+  },
+  {
+    "mediaId": "mal_52505",
+    "animeId": "mal_52505",
+    "title": "Dark Gathering",
+    "malId": 52505,
+    "aniListId": 152802,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:00.575Z"
+  },
+  {
+    "mediaId": "mal_45",
+    "animeId": "mal_45",
+    "title": "Rurouni Kenshin",
+    "malId": 45,
+    "aniListId": 45,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:00.691Z"
+  },
+  {
+    "mediaId": "mal_205",
+    "animeId": "mal_205",
+    "title": "Samurai Champloo",
+    "malId": 205,
+    "aniListId": 205,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:00.789Z"
+  },
+  {
+    "mediaId": "mal_36028",
+    "animeId": "mal_36028",
+    "title": "Golden Kamuy",
+    "malId": 36028,
+    "aniListId": 99699,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:30:03.570Z"
+  },
+  {
+    "mediaId": "mal_12031",
+    "animeId": "mal_12031",
+    "title": "Kingdom",
+    "malId": 12031,
+    "aniListId": 12031,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:00.982Z"
+  },
+  {
+    "mediaId": "mal_42897",
+    "animeId": "mal_42897",
+    "title": "Horimiya",
+    "malId": 42897,
+    "aniListId": 124080,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:30:04.798Z"
+  },
+  {
+    "mediaId": "mal_37999",
+    "animeId": "mal_37999",
+    "title": "Kaguya-sama: Love is War",
+    "malId": 37999,
+    "aniListId": 101922,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:30:05.520Z"
+  },
+  {
+    "mediaId": "mal_23273",
+    "animeId": "mal_23273",
+    "title": "Your Lie in April",
+    "malId": 23273,
+    "aniListId": 20665,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:01.354Z"
+  },
+  {
+    "mediaId": "mal_9989",
+    "animeId": "mal_9989",
+    "title": "Anohana: The Flower We Saw That Day",
+    "malId": 9989,
+    "aniListId": 9989,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:30:06.706Z"
+  },
+  {
+    "mediaId": "mal_31043",
+    "animeId": "mal_31043",
+    "title": "Erased",
+    "malId": 31043,
+    "aniListId": 21234,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:01.506Z"
+  },
+  {
+    "mediaId": "mal_4224",
+    "animeId": "mal_4224",
+    "title": "Toradora!",
+    "malId": 4224,
+    "aniListId": 4224,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:30:07.986Z"
+  },
+  {
+    "mediaId": "mal_37430",
+    "animeId": "mal_37430",
+    "title": "That Time I Got Reincarnated as a Slime",
+    "malId": 37430,
+    "aniListId": 101280,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:30:08.702Z"
+  },
+  {
+    "mediaId": "mal_31240",
+    "animeId": "mal_31240",
+    "title": "Re:ZERO -Starting Life in Another World-",
+    "malId": 31240,
+    "aniListId": 21355,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:01.731Z"
+  },
+  {
+    "mediaId": "mal_29803",
+    "animeId": "mal_29803",
+    "title": "Overlord",
+    "malId": 29803,
+    "aniListId": 20853,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:01.799Z"
+  },
+  {
+    "mediaId": "mal_39535",
+    "animeId": "mal_39535",
+    "title": "Mushoku Tensei: Jobless Reincarnation",
+    "malId": 39535,
+    "aniListId": 108465,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:30:10.620Z"
+  },
+  {
+    "mediaId": "mal_35790",
+    "animeId": "mal_35790",
+    "title": "The Rising of the Shield Hero",
+    "malId": 35790,
+    "aniListId": 99263,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:02.002Z"
+  },
+  {
+    "mediaId": "anivault_rt_liar_game",
+    "animeId": "anivault_rt_liar_game",
+    "title": "Liar Game",
+    "malId": null,
+    "aniListId": null,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:22.503Z"
+  },
+  {
+    "mediaId": "mal_54492",
+    "animeId": "mal_54492",
+    "title": "The Apothecary Diaries",
+    "malId": 54492,
+    "aniListId": 161645,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:24.225Z"
+  },
+  {
+    "mediaId": "mal_51552",
+    "animeId": "mal_51552",
+    "title": "My Happy Marriage",
+    "malId": 51552,
+    "aniListId": 147103,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:24.297Z"
+  },
+  {
+    "mediaId": "mal_46569",
+    "animeId": "mal_46569",
+    "title": "Hell's Paradise",
+    "malId": 46569,
+    "aniListId": 128893,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:24.381Z"
+  },
+  {
+    "mediaId": "mal_28735",
+    "animeId": "mal_28735",
+    "title": "Showa Genroku Rakugo Shinju",
+    "malId": 28735,
+    "aniListId": 20972,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:24.893Z"
+  },
+  {
+    "mediaId": "mal_2251",
+    "animeId": "mal_2251",
+    "title": "Baccano!",
+    "malId": 2251,
+    "aniListId": 2251,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:24.974Z"
+  },
+  {
+    "mediaId": "mal_32998",
+    "animeId": "mal_32998",
+    "title": "91 Days",
+    "malId": 32998,
+    "aniListId": 21711,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:25.044Z"
+  },
+  {
+    "mediaId": "mal_6594",
+    "animeId": "mal_6594",
+    "title": "Katanagatari",
+    "malId": 6594,
+    "aniListId": 6594,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:25.548Z"
+  },
+  {
+    "mediaId": "mal_31339",
+    "animeId": "mal_31339",
+    "title": "Drifters",
+    "malId": 31339,
+    "aniListId": 21279,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:25.630Z"
+  },
+  {
+    "mediaId": "mal_457",
+    "animeId": "mal_457",
+    "title": "Mushishi",
+    "malId": 457,
+    "aniListId": 457,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:25.772Z"
+  },
+  {
+    "mediaId": "mal_4642",
+    "animeId": "mal_4642",
+    "title": "Black Butler",
+    "malId": 4642,
+    "aniListId": 4642,
+    "retryCount": 1,
+    "lastTriedAt": "2026-09-20T16:31:25.175Z"
+  },
+  {
+    "mediaId": "mal_49738",
+    "animeId": "mal_49738",
+    "title": "Heike Monogatari",
+    "malId": 49738,
+    "aniListId": 138714,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:26.069Z"
+  },
+  {
+    "mediaId": "mal_37520",
+    "animeId": "mal_37520",
+    "title": "Dororo",
+    "malId": 37520,
+    "aniListId": 101347,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:26.160Z"
+  },
+  {
+    "mediaId": "mal_11111",
+    "animeId": "mal_11111",
+    "title": "Another",
+    "malId": 11111,
+    "aniListId": 11111,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:26.231Z"
+  },
+  {
+    "mediaId": "mal_7724",
+    "animeId": "mal_7724",
+    "title": "Shiki",
+    "malId": 7724,
+    "aniListId": 7724,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:26.343Z"
+  },
+  {
+    "mediaId": "mal_934",
+    "animeId": "mal_934",
+    "title": "Higurashi: When They Cry",
+    "malId": 934,
+    "aniListId": 934,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:26.422Z"
+  },
+  {
+    "mediaId": "mal_226",
+    "animeId": "mal_226",
+    "title": "Elfen Lied",
+    "malId": 226,
+    "aniListId": 226,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:26.503Z"
+  },
+  {
+    "mediaId": "mal_49052",
+    "animeId": "mal_49052",
+    "title": "Aoashi",
+    "malId": 49052,
+    "aniListId": 134732,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:26.575Z"
+  },
+  {
+    "mediaId": "mal_42923",
+    "animeId": "mal_42923",
+    "title": "Sk8 the Infinity",
+    "malId": 42923,
+    "aniListId": 124153,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:29:26.661Z"
+  },
+  {
+    "mediaId": "anivault_rt_shin_chan_movie_robot_dad_hindi_dubbed",
+    "animeId": "anivault_rt_shin_chan_movie_robot_dad_hindi_dubbed",
+    "title": "Shin Chan Movie Robot Dad Hindi Dubbed Download 1080P",
+    "malId": null,
+    "aniListId": null,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:30:26.865Z"
+  },
+  {
+    "mediaId": "anivault_rt_doraemon_the_movie_underwater_adventure",
+    "animeId": "anivault_rt_doraemon_the_movie_underwater_adventure",
+    "title": "Doraemon The Movie Underwater Adventure",
+    "malId": null,
+    "aniListId": null,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:30:40.412Z"
+  },
+  {
+    "mediaId": "anivault_rt_doraemon_the_movie_khel_khilona_bhool_bhulaiya",
+    "animeId": "anivault_rt_doraemon_the_movie_khel_khilona_bhool_bhulaiya",
+    "title": "Doraemon The Movie Khel Khilona Bhool Bhulaiya Hindi Download 720P",
+    "malId": null,
+    "aniListId": null,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:30:53.976Z"
+  },
+  {
+    "mediaId": "anivault_rt_doraemon_the_movie_nobita_ki_nayi_duniya",
+    "animeId": "anivault_rt_doraemon_the_movie_nobita_ki_nayi_duniya",
+    "title": "Doraemon The Movie Nobita Ki Nayi Duniya",
+    "malId": null,
+    "aniListId": null,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:31:12.801Z"
+  },
+  {
+    "mediaId": "anivault_rt_doraemon_nobita_aur_dinosaur_yoddha_hindi",
+    "animeId": "anivault_rt_doraemon_nobita_aur_dinosaur_yoddha_hindi",
+    "title": "Doraemon Nobita Aur Dinosaur Yoddha Hindi",
+    "malId": null,
+    "aniListId": null,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:32:04.540Z"
+  },
+  {
+    "mediaId": "anivault_rt_doraemon_the_movie_nobitas_dorabian_nights_hindi_dubbed_download",
+    "animeId": "anivault_rt_doraemon_the_movie_nobitas_dorabian_nights_hindi_dubbed_download",
+    "title": "Doraemon The Movie Nobitas Dorabian Nights Hindi Dubbed Download",
+    "malId": null,
+    "aniListId": null,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:32:14.274Z"
+  },
+  {
+    "mediaId": "anivault_rt_doraemon_the_movie_nobitas_dinosaur_hindi_dubbed_download",
+    "animeId": "anivault_rt_doraemon_the_movie_nobitas_dinosaur_hindi_dubbed_download",
+    "title": "Doraemon The Movie Nobitas Dinosaur Hindi Dubbed Download",
+    "malId": null,
+    "aniListId": null,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:32:14.831Z"
+  },
+  {
+    "mediaId": "anivault_rt_doraemon_the_movie_galaxy_super_express_hindi_hd",
+    "animeId": "anivault_rt_doraemon_the_movie_galaxy_super_express_hindi_hd",
+    "title": "Doraemon The Movie Galaxy Super Express Hindi Hd",
+    "malId": null,
+    "aniListId": null,
+    "retryCount": 0,
+    "lastTriedAt": "2026-09-20T16:32:16.711Z"
   }
 ]
