@@ -58,3 +58,22 @@ export interface SyncStatus {
   lastSyncTimestamp?: string;
   stats?: CatalogueStats;
 }
+
+export type ThemeMode = 'dark' | 'light' | 'system';
+
+export interface UserAccount {
+  id: string;
+  name: string;
+  email?: string;
+  avatar?: string;
+  provider: 'guest' | 'google' | 'apple' | 'email';
+  createdAt: string;
+}
+
+export interface UserData {
+  favorites: string[]; // anime IDs
+  watchlist: string[]; // Watch Later anime IDs
+  completed: string[]; // Watched anime IDs
+  history: { animeId: string; timestamp: number }[];
+  theme: ThemeMode;
+}

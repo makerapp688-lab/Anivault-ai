@@ -1,28 +1,29 @@
 {
-  "totalRareToonUrlsScraped": 172,
-  "totalUniqueAnime": 108,
-  "verifiedArtworkCount": 108,
+  "totalRareToonUrlsScraped": 418,
+  "totalUniqueAnime": 112,
+  "verifiedArtworkCount": 112,
   "placeholderArtworkCount": 0,
+  "exactProviderMappings": 112,
   "genresBreakdown": {
-    "Comedy": 74,
+    "Comedy": 75,
     "Sci-Fi": 52,
-    "Adventure": 77,
-    "Action": 27,
+    "Adventure": 78,
+    "Action": 29,
     "Superhero": 3,
     "Romance": 5,
-    "Fantasy": 19,
-    "Drama": 13,
+    "Fantasy": 22,
+    "Drama": 16,
     "Martial Arts": 2,
-    "Sports": 3,
+    "Sports": 4,
     "Supernatural": 10,
     "Slice of Life": 14,
     "Mystery": 5,
-    "Psychological": 3,
+    "Psychological": 4,
     "Thriller": 1,
     "Historical": 2,
     "Parody": 1,
     "Family": 4,
-    "Isekai": 1
-  },
-  "exactProviderMappings": 108
+    "Isekai": 4,
+    "Shounen": 1
+  }
 }

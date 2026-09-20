@@ -42,7 +42,8 @@ app.get('/api/health', (req, res) => {
     status: 'ok',
     app: 'AniVault',
     totalAnime: catalogueCache.length,
-    activeProvider: 'RareToon India'
+    activeProvider: 'RareToon India (RareAnimes)',
+    providerUrl: 'https://www.rareanimes.mov/home/'
   });
 });
 
